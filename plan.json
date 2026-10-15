@@ -1,0 +1,135 @@
+{
+  "version": 1,
+  "updatedAt": "2026-10-14T01:23:22+00:00",
+  "abstract": "为希望系统提升打字水平的用户（学生、办公人士、程序员、录入考试备考者）设计并构建一个打字练习网站，交付形态为单个自包含 index.html，存于用户指定的 D:\\打字练习网站\\（双击即可离线打开），并在桌面创建快捷方式指向它。信息架构按现代产品风（modern-product）组织：左侧导航 + 练习工作台为核心；配色与气质采用用户指定的莫兰迪色系——低饱和暖灰底、黛蓝主色、鼠尾草绿与陶土红语义色，衬线标题 + 无衬线正文 + 等宽数字，界面简洁无干扰。功能覆盖：分级课程（基础键位→单词→短句→文章）、专项训练（易错键位/限时提速/盲打强化）、逐字符实时高亮纠错与错误类型分析、WPM/正确率/时长数据追踪与趋势图表、自定义素材导入、内置素材库（文章/代码/公文/诗词/专业词汇）、单词雨游戏、考试模拟与评分报告，以及 Tab/Esc/Enter/Alt+数字 等键盘快捷键；所有数据存 localStorage。请在批准前重点核对：功能清单是否齐全、莫兰迪色系与整体气质是否符合预期、单文件 HTML 交付形式是否认可。",
+  "brief": {
+    "artifactType": "website",
+    "targetPlatform": [
+      "desktop"
+    ],
+    "audience": "希望系统提升打字速度与准确率的电脑用户：学生、办公人士、程序员、准备计算机录入/文档录入考试的人员",
+    "businessGoal": "提供一个科学的打字练习网站：分级进阶练习（基础键位→单词→短句→文章）、专项训练（易错键位/提速/盲打强化）、逐字符实时纠错、数据化进度追踪（WPM/正确率/时长）、自定义素材导入、打字游戏与考试模拟模式，帮助用户持续提升打字水平",
+    "constraints": "莫兰迪色系（低饱和、柔和，避免艳丽高饱和色与默认 AI 蓝紫）；练习界面简洁无干扰；支持键盘快捷键；纯前端单文件、可离线双击打开；数据存 localStorage；不依赖外部网络资源（无 CDN/外链字体/图片）；桌面优先且窄屏不横向溢出；含深色模式；网站文件存于 D:\\打字练习网站\\，并经桌面快捷方式访问（用户指定）",
+    "mustHaveContent": "1) 分级课程：基础键位（中排/上排/下排/数字/符号）、单词、短句、文章；2) 专项训练：易错键位专项、限时提速、盲打强化；3) 实时反馈：逐字符高亮纠错、错误即时标记；4) 数据追踪：WPM、正确率、练习时长、历史趋势、错误类型分析（易错键位热力图）；5) 自定义素材：粘贴文本/上传 txt + 内置素材库（热门文章、代码、公文、诗词、专业词汇）；6) 游戏模式：单词雨打字游戏；7) 考试模拟：限时录入 + 评分报告；8) 键盘快捷键（Tab 重开等）；9) 虚拟键盘提示"
+  },
+  "output": {
+    "target": "html",
+    "componentLibrary": "none"
+  },
+  "artifacts": [
+    {
+      "path": "index.html",
+      "action": "create",
+      "purpose": "打字练习网站的全部实现（界面/样式/练习引擎/数据持久化/游戏与考试模式），单文件自包含",
+      "requirements": [
+        "单文件自包含：内联 CSS/JS，无任何外部网络依赖（无 CDN、无外链字体/图片），双击即可离线使用",
+        "莫兰迪 token 体系：--seed-* 种子 token（bg/fg/surface/primary/accent/error/radius/density/text-scale）+ 语义与组件层派生；颜色/尺寸字面值仅出现在 seed 声明处，其余全部 var()/color-mix() 消费；含 [data-theme=\"dark\"] 深色变体",
+        "七大视图（侧边栏导航 + 视图状态清晰）：练习工作台、课程、专项训练、素材库、游戏（单词雨）、考试模拟、数据统计",
+        "练习引擎：逐字符比对与实时高亮（正确/错误/当前位置）、Backspace 回改、严格模式开关；支持 IME 中文输入（isComposing 防护 + composition 事件），中英文内容均可练习与统计",
+        "实时指标：WPM（净）、原始 WPM、正确率、已用时长、进度、错误数；结束生成报告（含错误明细与弱键提示）",
+        "分级课程：基础键位（中排/上排/下排/数字/符号，按键位集合生成练习串）→ 单词 → 短句 → 文章四级；含通过标准、进度状态、下一课衔接",
+        "专项训练：基于错误统计的易错键位生成练习；15/30/60 秒限时提速（记录最佳）；盲打强化（隐藏键盘与键位提示）",
+        "素材库：内置分类内容（热门文章/代码/公文/诗词/专业词汇，均为无版权风险的原创或公版文本）；自定义粘贴文本与上传 .txt 导入、可删除、可一键开始练习",
+        "单词雨游戏：下落单词、输入匹配消除、连击计分、生命值、难度递增、结算界面与最佳分",
+        "考试模拟：3/5/10 分钟限时、期间不显示对错反馈、结束后生成评分报告（速度/正确率/评级/错误明细）",
+        "数据统计：累计时长/次数/平均 WPM/平均正确率 KPI；WPM 与正确率趋势图（手绘内联 SVG，附表格或 aria 兜底、数值可见）；键盘错误热力图；易错键排行与混淆对；错误类型分析（邻键误触/其他）；localStorage 持久化、导出/导入 JSON、清空需二次确认",
+        "键盘快捷键：Tab 重开、Esc 暂停/退出菜单、Enter 确认/下一段、Alt+1..7 切换视图、? 打开快捷键帮助；所有快捷键在界面中有可发现的说明",
+        "虚拟键盘：QWERTY 布局，下一键提示高亮、按下反馈、错误热力显示；可显示/隐藏切换",
+        "响应式与无障碍：桌面优先，1280/1024/窄屏三档自检不横向溢出、不重叠裁切；表单控件均有 label/aria-label；focus-visible 样式；错误状态不只靠颜色（附下划线/图标）；尊重 prefers-reduced-motion",
+        "文案与状态：空/暂停/完成/错误（数据损坏回退）等状态均有明确界面反馈；无占位文案、无编造数据"
+      ]
+    },
+    {
+      "path": "桌面/打字练习网站.lnk",
+      "action": "create",
+      "purpose": "在用户桌面创建指向 D:\\打字练习网站\\index.html 的快捷方式，双击直接打开网站",
+      "requirements": [
+        "用 PowerShell WScript.Shell 创建 .lnk，目标为 index.html（默认浏览器打开），工作目录设为 D:\\打字练习网站",
+        "桌面实际路径以 [Environment]::GetFolderPath('Desktop') 解析（兼容 OneDrive 重定向）",
+        "创建后验证文件存在；若 .lnk 方案失败则改用 .url（file:///）方案并告知用户"
+      ]
+    }
+  ],
+  "designDirection": {
+    "fidelity": "interactive",
+    "styleSource": "direction（用户指定：莫兰迪色系；风格方向：modern-product）",
+    "visualTone": [
+      "soft-warm",
+      "modern-minimal"
+    ],
+    "designSystemId": null,
+    "directionId": "modern-product"
+  },
+  "structure": {
+    "screens": [
+      "练习工作台（打开即练：顶部实时指标 + 逐字符高亮文本 + 虚拟键盘）",
+      "课程（四级进阶：基础键位/单词/短句/文章）",
+      "专项训练（易错键位/限时提速/盲打强化）",
+      "素材库（内置分类 + 自定义导入）",
+      "游戏（单词雨）",
+      "考试模拟（限时 + 评分报告）",
+      "数据统计（KPI/趋势图/热力图/错误分析）"
+    ],
+    "sections": [
+      "侧边栏导航与设置（主题切换、快捷键帮助）",
+      "顶部指标栏（WPM/正确率/时长/进度/错误数）",
+      "练习文本显示区（逐字符状态：正确/错误/当前位置/待输入）",
+      "虚拟键盘（下一键提示/按下反馈/错误热力）",
+      "结果报告面板（速度/正确率/错误明细/弱键建议）",
+      "统计图表区（趋势折线、键盘热力图、错误排行表）"
+    ]
+  },
+  "interaction": {
+    "primaryFlow": "打开页面进入练习工作台（可直接开始输入）→ 逐字符实时高亮 + 指标实时更新（错误即时标记）→ 完成或暂停 → 结果报告 → 下一课/再来一次；其它视图从侧边栏（Alt+1..7）进入：课程选集 → 回工作台练习；素材库选文/导入 → 开始练习；训练/考试/游戏各自有独立流程与结算",
+    "states": [
+      "空状态：无练习数据时统计页与易错键位给出引导文案",
+      "练习中（含暂停遮罩、窗口失焦遮罩）",
+      "完成报告（达标/未达标反馈 + 弱键建议）",
+      "考试倒计时与结束评分报告",
+      "游戏进行中/暂停/结算",
+      "素材导入成功/失败提示；数据清空二次确认",
+      "浅色/深色主题切换"
+    ]
+  },
+  "quality": {
+    "responsive": true,
+    "accessibility": true,
+    "lintRequired": true,
+    "acceptanceCriteria": [
+      "生成的产物具有响应式布局，且没有明显的文字重叠或主要控件被裁切（1280/1024/窄屏三档自检）。",
+      "主要操作、输入控件、空/加载中/错误状态、以及关键内容均清晰可见，且与 brief 相符。",
+      "质量检查结果 P0 = 0，所有 P1 问题均已修复或有明确豁免说明。",
+      "打开 index.html（file://）即可在无网络环境下完成一次完整练习：输入、逐字符实时高亮、实时 WPM/正确率/时长、结束报告均正常工作。",
+      "中文（拼音输入法整字提交）与英文（直接输入）两种内容均可完成练习并正确统计。",
+      "刷新页面后练习历史（次数/WPM/正确率/时长/易错键）仍保留（localStorage），且支持导出/导入 JSON。",
+      "快捷键符合说明：Tab 重开、Esc 暂停/退出、Enter 确认/下一段、Alt+1..7 切换视图、? 帮助。",
+      "统计图表的数值可见且有可访问兜底（表格或 aria-label），错误状态不单靠颜色区分（附下划线/图标）。"
+    ]
+  },
+  "risks": [
+    "如果用户在规划期间改变产品方向、平台、输出目标、组件库、或视觉风格来源，要在生成前更新计划。",
+    "IME（中文拼音输入法）在个别浏览器/输入法组合下的 composition 事件行为不完全一致；构建时以 isComposing 防护 + 值差量比对做兼容，并将中文练习归因限制在字符级（不强行归因到物理键）。",
+    "localStorage 在隐私模式等场景可能不可用：以 try/catch 回退为内存存储并在界面提示本次数据不会保留。"
+  ],
+  "resources": {
+    "skill": {
+      "id": "web-prototype",
+      "rationale": "通用桌面 Single-file Web 模板：单文件自包含 HTML + 种子 token/class 体系，最贴合本项目『单文件、离线可用、桌面优先』的交付形态；遵循其构建工作流与 craft 要求（typography/color/anti-ai-slop）"
+    },
+    "styleReference": {
+      "primary": "notion",
+      "inspiration": ["friendly", "education-platform"],
+      "rationale": "Notion 的暖调极简（暖中性色、柔和表面、衬线标题、发丝边框）与用户要求的莫兰迪气质最贴合；friendly 提供低饱和柔和用色参考；education-platform 提供学习产品所需的进度清晰度与反馈设计参考。三者均为灵感来源，将生成本项目自己的莫兰迪 --seed-* token，不直接复制其 CSS"
+    },
+    "requiredReads": [
+      { "kind": "skill", "id": "web-prototype", "path": "references/subskills/web-prototype/SKILL.md", "reason": "构建工作流、种子模板约定与硬性规则" },
+      { "kind": "skill", "id": "web-prototype/checklist", "path": "references/subskills/web-prototype/references/checklist.md", "reason": "该 skill 的附加自查清单，质量检查时与 artifact-quality-checklist 并用" },
+      { "kind": "skill", "id": "web-prototype/template", "path": "references/subskills/web-prototype/assets/template.html", "reason": "种子模板：token 与 class 体系起点，保留其约定并按应用形态扩展" },
+      { "kind": "design-system", "id": "notion", "path": "references/design-systems/reference/notion/DESIGN.md", "reason": "主参考全文：暖调中性色/柔和表面/发丝边框/衬线标题的具体做法" },
+      { "kind": "design-system", "id": "friendly", "path": "references/design-systems/reference/friendly/DESIGN.md", "reason": "低饱和柔和用色参考" },
+      { "kind": "craft", "id": "typography", "path": "references/craft/reference/typography.md", "reason": "web-prototype 声明的 craft 规则（排版）" },
+      { "kind": "craft", "id": "color", "path": "references/craft/reference/color.md", "reason": "web-prototype 声明的 craft 规则（配色）" },
+      { "kind": "craft", "id": "anti-ai-slop", "path": "references/craft/reference/anti-ai-slop.md", "reason": "web-prototype 声明的 craft 规则（反 AI 感）" }
+    ]
+  }
+}

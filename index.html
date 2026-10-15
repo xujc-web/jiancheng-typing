@@ -1,0 +1,3141 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="color-scheme" content="light dark" />
+<title>键程 · 打字练习工作台</title>
+<meta name="description" content="分级打字练习、专项训练、实时纠错与数据追踪，所有数据保存在本机浏览器。" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='8'%20fill='%235B7080'/%3E%3Crect%20x='6'%20y='11'%20width='9'%20height='9'%20rx='2.4'%20fill='%23F1EEE8'/%3E%3Crect%20x='17'%20y='11'%20width='9'%20height='9'%20rx='2.4'%20fill='%23F1EEE8'%20opacity='0.55'/%3E%3C/svg%3E" />
+<script>
+/* 尽早应用主题，避免首帧闪烁 */
+(function () {
+  try {
+    var raw = localStorage.getItem('jiancheng.typing.v1');
+    var theme = '';
+    if (raw) { theme = (JSON.parse(raw).settings || {}).theme || ''; }
+    if (!theme) { theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; }
+    document.documentElement.setAttribute('data-theme', theme);
+  } catch (err) { /* 默认浅色 */ }
+})();
+</script>
+<style>
+/* ══════════════════════════════════════════════════════════════════
+   键程 · Morandi Typing Studio
+   种子 token（--seed-*）是本文件唯一允许出现颜色字面值的地方，
+   其余所有颜色均通过 var() / color-mix() 派生。
+   ══════════════════════════════════════════════════════════════════ */
+:root {
+  --seed-bg: #F1EEE8;
+  --seed-surface: #FAF8F3;
+  --seed-fg: #3A3833;
+  --seed-primary: #5B7080;
+  --seed-accent: #93A489;
+  --seed-error: #B0736A;
+
+  --seed-radius: 12px;
+  --seed-density: 1;
+  --seed-text-scale: 1;
+
+  /* ── 语义色（全部派生） ── */
+  --color-bg: var(--seed-bg);
+  --color-surface: var(--seed-surface);
+  --color-fg: var(--seed-fg);
+  --color-muted: color-mix(in oklab, var(--seed-fg) 66%, var(--seed-bg));
+  --color-faint: color-mix(in oklab, var(--seed-fg) 38%, var(--seed-bg));
+  --color-border: color-mix(in oklab, var(--seed-fg) 13%, var(--seed-bg));
+  --color-border-strong: color-mix(in oklab, var(--seed-fg) 26%, var(--seed-bg));
+  --color-primary: var(--seed-primary);
+  --color-primary-text: color-mix(in oklab, var(--seed-primary) 78%, var(--seed-fg));
+  --color-primary-soft: color-mix(in oklab, var(--seed-primary) 13%, transparent);
+  --color-on-primary: var(--seed-surface);
+  --color-accent: var(--seed-accent);
+  --color-accent-text: color-mix(in oklab, var(--seed-accent) 68%, var(--seed-fg));
+  --color-accent-soft: color-mix(in oklab, var(--seed-accent) 18%, transparent);
+  --color-error: var(--seed-error);
+  --color-error-text: color-mix(in oklab, var(--seed-error) 70%, var(--seed-fg));
+  --color-error-soft: color-mix(in oklab, var(--seed-error) 16%, transparent);
+  --color-fg-soft: color-mix(in oklab, var(--seed-fg) 6%, transparent);
+  --color-shadow: color-mix(in oklab, var(--seed-fg) 16%, transparent);
+  --color-sel: color-mix(in oklab, var(--seed-primary) 24%, transparent);
+
+  /* ── 字号 ── */
+  --font-display: 'Iowan Old Style', 'Charter', Georgia, 'Songti SC', 'SimSun', 'Noto Serif SC', serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', system-ui, sans-serif;
+  --font-mono: ui-monospace, 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Consolas, 'Courier New', monospace;
+
+  --fs-display: clamp(28px, 2.6vw, 36px);
+  --fs-h2: 21px;
+  --fs-h3: 16px;
+  --fs-body: 15px;
+  --fs-small: 13px;
+  --fs-cap: 12px;
+
+  /* ── 间距（受密度控制） ── */
+  --sp-1: calc(4px * var(--seed-density));
+  --sp-2: calc(8px * var(--seed-density));
+  --sp-3: calc(12px * var(--seed-density));
+  --sp-4: calc(16px * var(--seed-density));
+  --sp-5: calc(24px * var(--seed-density));
+  --sp-6: calc(32px * var(--seed-density));
+  --sp-7: calc(48px * var(--seed-density));
+
+  /* ── 圆角 / 动效 ── */
+  --radius-sm: calc(var(--seed-radius) * 0.5);
+  --radius: var(--seed-radius);
+  --radius-lg: calc(var(--seed-radius) * 1.35);
+  --radius-pill: 999px;
+  --shadow-1: 0 1px 2px var(--color-shadow);
+  --shadow-2: 0 2px 6px var(--color-shadow), 0 12px 32px color-mix(in oklab, var(--seed-fg) 8%, transparent);
+  --dur: 160ms;
+  --ease: cubic-bezier(0.33, 1, 0.68, 1);
+
+  --sidebar-w: 224px;
+  --practice-size: calc(26px * var(--seed-text-scale));
+}
+
+[data-theme="dark"] {
+  --seed-bg: #2A2723;
+  --seed-surface: #35312B;
+  --seed-fg: #E9E4DA;
+  --seed-primary: #93A5B5;
+  --seed-accent: #A3B499;
+  --seed-error: #C98A7F;
+  color-scheme: dark;
+}
+[data-theme="light"] { color-scheme: light; }
+
+/* ── 基础 ── */
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-fg);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+::selection { background: var(--color-sel); }
+img, svg { display: block; max-width: 100%; }
+button { font: inherit; color: inherit; cursor: pointer; background: none; border: 0; padding: 0; }
+input, select, textarea { font: inherit; color: inherit; }
+h1, h2, h3, h4 { margin: 0; }
+p { margin: 0; text-wrap: pretty; }
+h1, h2 { text-wrap: balance; }
+:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; border-radius: var(--radius-sm); }
+.visually-hidden {
+  position: absolute !important; width: 1px; height: 1px;
+  margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+}
+.skip-link {
+  position: absolute; left: var(--sp-3); top: -48px; z-index: 60;
+  background: var(--color-surface); border: 1px solid var(--color-border);
+  padding: var(--sp-2) var(--sp-3); border-radius: var(--radius-sm);
+  transition: top var(--dur) var(--ease);
+}
+.skip-link:focus { top: var(--sp-3); }
+
+/* ── 应用骨架 ── */
+.app { display: grid; grid-template-columns: var(--sidebar-w) minmax(0, 1fr); min-height: 100vh; }
+.sidebar {
+  border-right: 1px solid var(--color-border);
+  padding: var(--sp-5) var(--sp-3) var(--sp-4);
+  display: flex; flex-direction: column; gap: var(--sp-5);
+  position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  background: var(--color-bg);
+}
+.brand { display: flex; align-items: center; gap: var(--sp-3); padding-inline: var(--sp-2); }
+.brand-mark {
+  width: 38px; height: 38px; flex: none;
+  display: grid; place-items: center;
+  background: var(--color-primary); color: var(--color-on-primary);
+  border-radius: calc(var(--radius) * 0.8);
+}
+.brand-mark svg { width: 20px; height: 20px; }
+.brand-name { font-family: var(--font-display); font-size: 19px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.2; }
+.brand-sub { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; color: var(--color-muted); }
+.nav { display: flex; flex-direction: column; gap: 2px; }
+.nav-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-faint); padding: var(--sp-2) var(--sp-2) var(--sp-1); }
+.nav-item {
+  display: flex; align-items: center; gap: var(--sp-3);
+  width: 100%; text-align: left;
+  padding: calc(9px * var(--seed-density)) var(--sp-3);
+  border-radius: var(--radius-sm);
+  color: var(--color-muted); font-size: 14px;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.nav-item svg { width: 17px; height: 17px; flex: none; opacity: 0.85; }
+.nav-item .ni-hint { margin-left: auto; font-family: var(--font-mono); font-size: 10px; color: var(--color-faint); opacity: 0; transition: opacity var(--dur) var(--ease); }
+.nav-item:hover { background: var(--color-fg-soft); color: var(--color-fg); }
+.nav-item:hover .ni-hint { opacity: 1; }
+.nav-item.active { background: var(--color-primary-soft); color: var(--color-primary-text); font-weight: 500; }
+.sidebar-foot { margin-top: auto; display: flex; flex-direction: column; gap: var(--sp-2); }
+.side-actions { display: flex; gap: var(--sp-2); }
+.side-meta { font-family: var(--font-mono); font-size: 10.5px; color: var(--color-faint); padding-inline: var(--sp-2); line-height: 1.7; }
+
+.main { min-width: 0; padding: var(--sp-6) var(--sp-6) var(--sp-7); }
+.view { display: none; max-width: 1120px; margin-inline: auto; }
+.view.active { display: block; animation: viewIn 240ms var(--ease); }
+@keyframes viewIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.view-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: var(--sp-4); margin-bottom: var(--sp-5); }
+.view-title { font-family: var(--font-display); font-size: var(--fs-display); font-weight: 600; letter-spacing: -0.015em; line-height: 1.15; }
+.view-desc { color: var(--color-muted); font-size: 14px; margin-top: var(--sp-1); max-width: 60ch; }
+.eyebrow {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--color-primary-text); margin-bottom: var(--sp-2);
+}
+
+/* ── 通用部件 ── */
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-5);
+}
+.card + .card { margin-top: var(--sp-4); }
+.card-title { font-family: var(--font-body); font-size: var(--fs-h3); font-weight: 600; letter-spacing: -0.005em; }
+.card-desc { color: var(--color-muted); font-size: var(--fs-small); margin-top: 2px; }
+.row { display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap; }
+.row-between { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); flex-wrap: wrap; }
+.stack { display: flex; flex-direction: column; gap: var(--sp-3); }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-4); }
+.grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-4); }
+.grid4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--sp-3); }
+.muted { color: var(--color-muted); }
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.small { font-size: var(--fs-small); }
+.divider { border: 0; border-top: 1px solid var(--color-border); margin: var(--sp-4) 0; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2);
+  padding: calc(9px * var(--seed-density)) calc(16px * var(--seed-density));
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  font-size: 14px; font-weight: 500; letter-spacing: 0.005em;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease), transform 60ms var(--ease);
+}
+.btn:active { transform: translateY(1px); }
+.btn svg { width: 15px; height: 15px; }
+.btn-primary { background: var(--color-primary); color: var(--color-on-primary); }
+.btn-primary:hover { background: color-mix(in oklab, var(--color-primary) 88%, var(--seed-fg)); }
+.btn-secondary { border-color: var(--color-border-strong); color: var(--color-fg); background: transparent; }
+.btn-secondary:hover { border-color: var(--color-fg); background: var(--color-fg-soft); }
+.btn-ghost { color: var(--color-muted); }
+.btn-ghost:hover { color: var(--color-fg); background: var(--color-fg-soft); }
+.btn-danger { color: var(--color-error-text); border: 1px solid color-mix(in oklab, var(--seed-error) 40%, transparent); }
+.btn-danger:hover { background: var(--color-error-soft); }
+.btn-sm { padding: calc(5px * var(--seed-density)) calc(10px * var(--seed-density)); font-size: var(--fs-small); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.icon-btn {
+  width: 34px; height: 34px; display: grid; place-items: center;
+  border-radius: var(--radius-sm); color: var(--color-muted);
+  border: 1px solid transparent;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.icon-btn svg { width: 17px; height: 17px; }
+.icon-btn:hover { background: var(--color-fg-soft); color: var(--color-fg); }
+.kbd {
+  font-family: var(--font-mono); font-size: 10.5px; line-height: 1;
+  padding: 3px 6px; border-radius: 5px;
+  border: 1px solid var(--color-border-strong); border-bottom-width: 2px;
+  color: var(--color-muted); background: var(--color-bg);
+  display: inline-block;
+}
+.pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 9px; border-radius: var(--radius-pill);
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.04em;
+  background: var(--color-primary-soft); color: var(--color-primary-text);
+}
+.pill.accent { background: var(--color-accent-soft); color: var(--color-accent-text); }
+.pill.error { background: var(--color-error-soft); color: var(--color-error-text); }
+.pill.plain { background: var(--color-fg-soft); color: var(--color-muted); }
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 11px; border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border-strong); color: var(--color-muted);
+  font-size: var(--fs-small);
+  transition: border-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.chip:hover { border-color: var(--color-fg); color: var(--color-fg); }
+.chip.mono { font-family: var(--font-mono); }
+.toggle {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 6px 11px; border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border); color: var(--color-muted);
+  font-size: var(--fs-small);
+  transition: all var(--dur) var(--ease);
+}
+.toggle .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--color-border-strong); transition: background var(--dur) var(--ease); }
+.toggle[aria-pressed="true"] { border-color: color-mix(in oklab, var(--seed-primary) 45%, transparent); color: var(--color-primary-text); background: var(--color-primary-soft); }
+.toggle[aria-pressed="true"] .dot { background: var(--color-primary); }
+.toggle:hover { border-color: var(--color-border-strong); }
+
+/* ── 表单 ── */
+.field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.field > label { font-size: var(--fs-small); color: var(--color-muted); }
+.field .hint { font-size: var(--fs-cap); color: var(--color-faint); }
+.input, .select, .textarea {
+  width: 100%;
+  padding: calc(8px * var(--seed-density)) calc(11px * var(--seed-density));
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.input:focus, .select:focus, .textarea:focus {
+  outline: none; border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-soft);
+}
+.textarea { min-height: 132px; resize: vertical; line-height: 1.6; }
+.select { appearance: none; padding-right: 30px; background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%); background-position: calc(100% - 15px) 55%, calc(100% - 10px) 55%; background-size: 5px 5px; background-repeat: no-repeat; }
+.seg { display: inline-flex; border: 1px solid var(--color-border-strong); border-radius: var(--radius-sm); overflow: hidden; }
+.seg button {
+  padding: calc(6px * var(--seed-density)) calc(13px * var(--seed-density));
+  font-size: var(--fs-small); color: var(--color-muted);
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.seg button + button { border-left: 1px solid var(--color-border); }
+.seg button:hover { color: var(--color-fg); }
+.seg button.active { background: var(--color-primary-soft); color: var(--color-primary-text); font-weight: 500; }
+
+/* ── 进度条 ── */
+.progress { height: 5px; border-radius: var(--radius-pill); background: var(--color-fg-soft); overflow: hidden; }
+.progress > i { display: block; height: 100%; width: 0; background: var(--color-primary); border-radius: inherit; transition: width 200ms var(--ease); }
+.progress.accent > i { background: var(--color-accent); }
+
+/* ── 统计条 / KPI ── */
+.stat-strip {
+  display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
+  border: 1px solid var(--color-border); border-radius: var(--radius-lg);
+  background: var(--color-surface); overflow: hidden;
+}
+.stat-cell { padding: var(--sp-3) var(--sp-4); border-left: 1px solid var(--color-border); }
+.stat-cell:first-child { border-left: 0; }
+.stat-k { display: block; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--color-faint); }
+.stat-v { display: block; font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 22px; margin-top: 3px; line-height: 1.2; }
+.stat-v small { font-size: 12px; color: var(--color-muted); }
+.stat-sub { display: block; font-size: 11px; color: var(--color-muted); }
+.kpi { padding: var(--sp-4); }
+.kpi .kpi-k { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-faint); }
+.kpi .kpi-v { font-family: var(--font-mono); font-size: 27px; margin-top: 6px; font-variant-numeric: tabular-nums; }
+.kpi .kpi-d { font-size: var(--fs-cap); color: var(--color-muted); margin-top: 3px; }
+
+/* ── 练习工作台 ── */
+.practice-shell { max-width: 940px; margin-inline: auto; display: flex; flex-direction: column; gap: var(--sp-3); }
+.practice-toolbar {
+  display: flex; align-items: flex-end; gap: var(--sp-3); flex-wrap: wrap;
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--color-border); border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+.practice-toolbar .field { min-width: 168px; }
+.toolbar-toggles { display: flex; gap: var(--sp-2); flex-wrap: wrap; margin-bottom: 1px; }
+.toolbar-end { margin-left: auto; display: flex; gap: var(--sp-2); align-items: center; margin-bottom: 1px; }
+.practice-stage {
+  position: relative;
+  min-height: calc(var(--practice-size) * 1.7 * 3 + var(--sp-5) * 2);
+  max-height: calc(var(--practice-size) * 1.7 * 3 + var(--sp-5) * 2);
+  overflow: hidden;
+  padding: var(--sp-5) var(--sp-5) var(--sp-4);
+  border: 1px solid var(--color-border); border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+.practice-text {
+  position: relative;
+  font-family: var(--font-mono);
+  font-size: var(--practice-size);
+  line-height: 1.7;
+  letter-spacing: 0.01em;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  color: var(--color-faint);
+  transition: transform 180ms var(--ease);
+}
+.practice-text.lang-zh { font-family: var(--font-body); font-size: calc(var(--practice-size) * 0.92); }
+.ch { border-radius: 3px; }
+.ch.ok { color: var(--color-fg); }
+.ch.err {
+  color: var(--color-error-text);
+  background: var(--color-error-soft);
+  text-decoration: underline wavy var(--color-error) 1.5px;
+  text-underline-offset: 5px;
+}
+.ch.cur { position: relative; }
+.ch.cur::before {
+  content: ""; position: absolute; left: -1px; top: 8%; width: 2px; height: 84%;
+  background: var(--color-primary); border-radius: 1px;
+  animation: caretBlink 1.1s steps(2, start) infinite;
+}
+.ch.cur.pend, .ch.cur.ok, .ch.cur.err { background: color-mix(in oklab, var(--seed-primary) 9%, transparent); }
+@keyframes caretBlink { 0%, 55% { opacity: 1; } 56%, 100% { opacity: 0; } }
+.stage-overlay {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  background: color-mix(in oklab, var(--seed-bg) 72%, transparent);
+  z-index: 3; text-align: center; padding: var(--sp-4);
+}
+.stage-overlay .overlay-card {
+  background: var(--color-surface); border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-lg); padding: var(--sp-5) var(--sp-6); box-shadow: var(--shadow-2);
+  display: flex; flex-direction: column; align-items: center; gap: var(--sp-3);
+}
+.hidden-input { position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px; top: 0; left: 0; }
+.practice-meta { display: flex; justify-content: space-between; gap: var(--sp-3); flex-wrap: wrap; padding-inline: 2px; }
+.practice-meta .pin { font-family: var(--font-mono); font-size: 11px; color: var(--color-faint); letter-spacing: 0.03em; }
+
+/* ── 虚拟键盘 ── */
+.kbd-wrap { display: flex; flex-direction: column; gap: calc(5px * var(--seed-density)); align-items: center; padding-block: var(--sp-2); }
+.kbd-wrap[hidden] { display: none; }
+.kbd-row { display: flex; gap: calc(5px * var(--seed-density)); justify-content: center; width: 100%; }
+.key {
+  position: relative;
+  flex: 1 1 0; min-width: 30px; max-width: 62px; height: calc(40px * var(--seed-density));
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+  border: 1px solid var(--color-border); border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  font-family: var(--font-mono); font-size: 11.5px; color: var(--color-muted);
+  transition: transform 60ms var(--ease), border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+  overflow: hidden; user-select: none;
+}
+.key .k-sub { font-size: 9px; color: var(--color-faint); }
+.key.w-wide { flex: 1.6 1 0; max-width: 92px; }
+.key.w-xwide { flex: 2.4 1 0; max-width: 128px; }
+.key.w-space { flex: 6 1 0; max-width: none; }
+.key::after {
+  content: ""; position: absolute; inset: 0;
+  background: var(--color-error); opacity: var(--heat, 0);
+  pointer-events: none;
+}
+.key.next { border-color: var(--color-primary); box-shadow: 0 0 0 2px var(--color-primary-soft); color: var(--color-primary-text); }
+.key.pressed { background: var(--color-primary-soft); transform: translateY(1px); }
+.kbd-caption { font-family: var(--font-mono); font-size: 10.5px; color: var(--color-faint); letter-spacing: 0.04em; }
+.kbd-legend { display: inline-flex; align-items: center; gap: 6px; }
+.kbd-legend i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+
+/* ── 结果报告 ── */
+.result-panel {
+  border: 1px solid var(--color-border); border-radius: var(--radius-lg);
+  background: var(--color-surface); padding: var(--sp-5);
+  display: flex; flex-direction: column; gap: var(--sp-4);
+}
+.result-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-3); flex-wrap: wrap; }
+.result-title { font-family: var(--font-display); font-size: 24px; font-weight: 600; }
+.result-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--sp-3); }
+.res-cell { padding: var(--sp-3); border: 1px solid var(--color-border); border-radius: var(--radius-sm); }
+.res-cell .rc-k { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-faint); }
+.res-cell .rc-v { font-family: var(--font-mono); font-size: 24px; margin-top: 4px; }
+.res-cell .rc-v small { font-size: 12px; color: var(--color-muted); }
+.weak-row { display: flex; align-items: center; gap: var(--sp-2); flex-wrap: wrap; }
+.weak-key { font-family: var(--font-mono); font-size: 12px; padding: 3px 8px; border-radius: 6px; background: var(--color-error-soft); color: var(--color-error-text); }
+
+/* ── 课程 ── */
+.level-block { display: flex; flex-direction: column; gap: var(--sp-3); }
+.level-head { display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap; }
+.level-no { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; color: var(--color-primary-text); }
+.level-name { font-family: var(--font-display); font-size: 21px; font-weight: 600; }
+.level-bar { flex: 1 1 150px; max-width: 260px; }
+.lesson-list { border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface); overflow: hidden; }
+.lesson-row {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: var(--sp-3); align-items: center;
+  padding: calc(13px * var(--seed-density)) var(--sp-4);
+}
+.lesson-row + .lesson-row { border-top: 1px solid var(--color-border); }
+.lesson-row:hover { background: var(--color-fg-soft); }
+.lesson-name { font-size: 14.5px; font-weight: 500; }
+.lesson-meta { font-size: var(--fs-cap); color: var(--color-muted); margin-top: 2px; }
+.lesson-stars { font-family: var(--font-mono); font-size: 12px; color: var(--color-accent-text); letter-spacing: 2px; }
+.lesson-stars .off { color: var(--color-border-strong); }
+.lesson-best { font-family: var(--font-mono); font-size: 11.5px; color: var(--color-muted); }
+.lesson-actions { display: flex; gap: var(--sp-2); }
+
+/* ── 专项训练 ── */
+.train-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-4); align-items: start; }
+.train-icon {
+  width: 38px; height: 38px; border-radius: var(--radius-sm);
+  display: grid; place-items: center;
+  background: var(--color-primary-soft); color: var(--color-primary-text);
+  margin-bottom: var(--sp-3);
+}
+.train-icon svg { width: 19px; height: 19px; }
+.train-card .card-title { margin-bottom: 4px; }
+.weak-grid { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-block: var(--sp-3); }
+.weak-cell {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  min-width: 62px; padding: var(--sp-2) var(--sp-3);
+  border: 1px solid var(--color-border); border-radius: var(--radius-sm);
+}
+.weak-cell .wk { font-family: var(--font-mono); font-size: 17px; }
+.weak-cell .wc { font-family: var(--font-mono); font-size: 10px; color: var(--color-error-text); }
+.duration-row { display: flex; gap: var(--sp-2); flex-wrap: wrap; margin-block: var(--sp-3); }
+
+/* ── 素材库 ── */
+.tabs { display: flex; gap: var(--sp-1); flex-wrap: wrap; border-bottom: 1px solid var(--color-border); margin-bottom: var(--sp-4); }
+.tab {
+  padding: var(--sp-2) var(--sp-3) calc(var(--sp-2) + 1px);
+  font-size: 14px; color: var(--color-muted);
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.tab:hover { color: var(--color-fg); }
+.tab.active { color: var(--color-primary-text); border-color: var(--color-primary); font-weight: 500; }
+.lib-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-3); }
+.lib-card {
+  border: 1px solid var(--color-border); border-radius: var(--radius); background: var(--color-surface);
+  padding: var(--sp-4); display: flex; flex-direction: column; gap: var(--sp-2); min-height: 150px;
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.lib-card:hover { border-color: var(--color-border-strong); box-shadow: var(--shadow-1); }
+.lib-title { font-size: 15px; font-weight: 600; line-height: 1.4; }
+.lib-meta { font-family: var(--font-mono); font-size: 10.5px; color: var(--color-faint); letter-spacing: 0.03em; }
+.lib-preview { font-size: var(--fs-cap); color: var(--color-muted); line-height: 1.7; flex: 1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.lib-actions { display: flex; gap: var(--sp-2); margin-top: auto; padding-top: var(--sp-2); }
+.import-panel { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: var(--sp-4); }
+.custom-item {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4); border: 1px solid var(--color-border); border-radius: var(--radius); background: var(--color-surface);
+}
+.custom-item + .custom-item { margin-top: var(--sp-2); }
+
+/* ── 游戏 ── */
+.game-shell { max-width: 940px; margin-inline: auto; display: flex; flex-direction: column; gap: var(--sp-3); }
+.game-hud {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--sp-2);
+  border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface); overflow: hidden;
+}
+.game-hud > div { padding: var(--sp-3) var(--sp-4); }
+.game-hud > div + div { border-left: 1px solid var(--color-border); }
+.game-arena {
+  position: relative; height: 430px; overflow: hidden;
+  border: 1px solid var(--color-border); border-radius: var(--radius-lg);
+  background:
+    linear-gradient(var(--color-fg-soft) 1px, transparent 1px) 0 0 / 100% 25%,
+    var(--color-surface);
+}
+.game-arena .baseline {
+  position: absolute; left: 0; right: 0; bottom: 54px; height: 1px;
+  background: var(--color-border-strong);
+}
+.gword {
+  position: absolute; top: -40px; left: 0;
+  font-family: var(--font-mono); font-size: 16px; letter-spacing: 0.02em;
+  padding: 4px 11px; border-radius: var(--radius-sm);
+  background: var(--color-surface); border: 1px solid var(--color-border-strong);
+  color: var(--color-fg); white-space: nowrap;
+}
+.gword .typed { color: var(--color-primary-text); }
+.gword.danger { border-color: color-mix(in oklab, var(--seed-error) 55%, transparent); color: var(--color-error-text); }
+.gword.hit { border-color: var(--color-accent); color: var(--color-accent-text); animation: hitOut 280ms var(--ease) forwards; }
+@keyframes hitOut { to { opacity: 0; transform: translateY(-16px) scale(1.06); } }
+.game-foot {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface);
+}
+.game-buffer { font-family: var(--font-mono); font-size: 19px; min-height: 28px; letter-spacing: 0.04em; color: var(--color-primary-text); }
+.game-buffer .caret2 { display: inline-block; width: 2px; height: 18px; background: var(--color-primary); vertical-align: -2px; margin-left: 1px; animation: caretBlink 1.1s steps(2, start) infinite; }
+.lives { display: inline-flex; gap: 4px; }
+.lives i { width: 10px; height: 10px; border-radius: 50%; background: var(--color-accent); display: inline-block; }
+.lives i.lost { background: var(--color-border-strong); }
+.game-overlay {
+  position: absolute; inset: 0; z-index: 4; display: grid; place-items: center;
+  background: color-mix(in oklab, var(--seed-bg) 76%, transparent); padding: var(--sp-4);
+}
+.game-overlay[hidden] { display: none; }
+
+/* ── 考试模拟 ── */
+.exam-shell { max-width: 940px; margin-inline: auto; display: flex; flex-direction: column; gap: var(--sp-3); }
+.exam-timer-wrap { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); flex-wrap: wrap; }
+.exam-timer { font-family: var(--font-mono); font-size: 30px; font-variant-numeric: tabular-nums; letter-spacing: 0.03em; }
+.exam-timer.urgent { color: var(--color-error-text); }
+.practice-text.feedbackless .ch.ok { color: var(--color-fg); }
+.report-card { border: 1px solid var(--color-border-strong); border-radius: var(--radius-lg); background: var(--color-surface); padding: var(--sp-6); position: relative; overflow: hidden; }
+.report-card::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 4px; background: var(--color-primary); }
+.grade-badge {
+  display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
+  width: 86px; height: 86px; border-radius: 50%;
+  border: 2px solid var(--color-primary); color: var(--color-primary-text);
+  font-family: var(--font-display); font-size: 24px; font-weight: 600;
+}
+.grade-badge small { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.08em; color: var(--color-muted); }
+.err-list { display: flex; flex-direction: column; gap: 6px; max-height: 240px; overflow-y: auto; }
+.err-item { display: flex; gap: var(--sp-3); align-items: baseline; font-family: var(--font-mono); font-size: 12.5px; padding: 5px 8px; border-radius: 6px; background: var(--color-error-soft); }
+.err-item .pos { color: var(--color-faint); min-width: 44px; }
+.err-item .want { color: var(--color-accent-text); }
+.err-item .got { color: var(--color-error-text); }
+
+/* ── 数据统计 ── */
+.chart-tools { display: flex; align-items: center; gap: var(--sp-2); flex-wrap: wrap; }
+.chart-svg { width: 100%; height: auto; display: block; }
+.chart-svg .grid-line { stroke: var(--color-border); stroke-width: 1; }
+.chart-svg .series { fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.chart-svg .series.s1 { stroke: var(--color-primary); }
+.chart-svg .series.s2 { stroke: var(--color-accent); }
+.chart-svg .dot { fill: var(--color-surface); stroke-width: 1.6; }
+.chart-svg .dot.s1 { stroke: var(--color-primary); }
+.chart-svg .dot.s2 { stroke: var(--color-accent); }
+.chart-svg .axis { font-family: var(--font-mono); font-size: 10px; fill: var(--color-faint); }
+.legend { display: flex; gap: var(--sp-3); align-items: center; font-size: var(--fs-cap); color: var(--color-muted); }
+.legend i { width: 14px; height: 3px; border-radius: 2px; display: inline-block; vertical-align: middle; margin-right: 5px; }
+.legend .l1 { background: var(--color-primary); }
+.legend .l2 { background: var(--color-accent); }
+.heat-kbd { display: flex; flex-direction: column; gap: 5px; align-items: center; }
+.heat-kbd .kbd-row { width: auto; }
+.heat-cell {
+  position: relative; width: 40px; height: 38px;
+  display: grid; place-items: center;
+  border: 1px solid var(--color-border); border-radius: 7px; background: var(--color-surface);
+  font-family: var(--font-mono); font-size: 11px; color: var(--color-muted);
+}
+.heat-cell::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: var(--color-error); opacity: var(--heat, 0); }
+.weak-table td .bar-mini { width: 90px; height: 6px; border-radius: 3px; background: var(--color-fg-soft); overflow: hidden; }
+.weak-table td .bar-mini i { display: block; height: 100%; background: var(--color-error); border-radius: 3px; }
+.typebars { display: flex; flex-direction: column; gap: var(--sp-3); }
+.typebar .tb-head { display: flex; justify-content: space-between; font-size: var(--fs-small); margin-bottom: 5px; }
+.typebar .tb-head .num { color: var(--color-muted); }
+.typebar .tb-track { height: 8px; border-radius: var(--radius-pill); background: var(--color-fg-soft); overflow: hidden; }
+.typebar .tb-fill { height: 100%; border-radius: inherit; background: var(--color-error); }
+.typebar.tb-adjacent .tb-fill { background: var(--color-primary); }
+
+/* ── 表格 ── */
+.ds-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.ds-table th, .ds-table td { padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--color-border); }
+.ds-table th { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-faint); font-weight: 500; }
+.ds-table tbody tr:hover { background: var(--color-fg-soft); }
+.ds-table .num-col { font-family: var(--font-mono); font-variant-numeric: tabular-nums; text-align: right; }
+
+/* ── 弹层 / 提示 ── */
+.modal-backdrop {
+  position: fixed; inset: 0; z-index: 50;
+  display: grid; place-items: center; padding: var(--sp-4);
+  background: color-mix(in oklab, var(--seed-fg) 34%, transparent);
+}
+.modal-backdrop[hidden] { display: none; }
+.modal {
+  width: min(560px, 100%);
+  max-height: min(80vh, 720px); overflow-y: auto;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong); border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-2);
+  padding: var(--sp-5);
+  display: flex; flex-direction: column; gap: var(--sp-4);
+}
+.modal-head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--sp-3); }
+.modal-title { font-family: var(--font-display); font-size: 21px; font-weight: 600; }
+.modal-actions { display: flex; justify-content: flex-end; gap: var(--sp-2); flex-wrap: wrap; }
+.shortcut-list { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--sp-2) var(--sp-4); align-items: center; font-size: 13.5px; }
+.shortcut-list .kbd { justify-self: start; }
+.toast-wrap { position: fixed; right: var(--sp-4); bottom: var(--sp-4); z-index: 70; display: flex; flex-direction: column; gap: var(--sp-2); }
+.toast {
+  background: var(--color-surface); border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius); box-shadow: var(--shadow-2);
+  padding: var(--sp-3) var(--sp-4); font-size: 13.5px; max-width: 340px;
+  animation: toastIn 220ms var(--ease);
+}
+.toast.warn { border-color: color-mix(in oklab, var(--seed-error) 45%, transparent); color: var(--color-error-text); }
+@keyframes toastIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+/* ── 空状态 ── */
+.empty-state {
+  border: 1px dashed var(--color-border-strong); border-radius: var(--radius-lg);
+  padding: var(--sp-6); text-align: center; color: var(--color-muted);
+  display: flex; flex-direction: column; align-items: center; gap: var(--sp-3);
+}
+.empty-state svg { width: 26px; height: 26px; color: var(--color-faint); }
+
+/* ── 盲打 · 换行符 ── */
+.practice-text.blind, .practice-text.blind .ch { color: transparent; }
+.practice-text.blind .ch.err { background: transparent; text-decoration: none; }
+.practice-text.blind .ch.cur::before { opacity: 0; animation: none; }
+.practice-text .br { opacity: 0.55; }
+
+/* ── 响应式 ── */
+@media (max-width: 1180px) {
+  .grid4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .lib-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 980px) {
+  .app { grid-template-columns: 1fr; }
+  .sidebar {
+    position: static; height: auto; overflow: visible;
+    border-right: 0; border-bottom: 1px solid var(--color-border);
+    padding: var(--sp-4) var(--sp-4) var(--sp-3);
+    gap: var(--sp-4);
+  }
+  .nav { flex-direction: row; flex-wrap: wrap; }
+  .nav-label { display: none; }
+  .nav-item { width: auto; }
+  .nav-item .ni-hint { display: none; }
+  .sidebar-foot { margin-top: 0; flex-direction: row; align-items: center; justify-content: space-between; }
+  .main { padding: var(--sp-5) var(--sp-4) var(--sp-6); }
+  .train-grid { grid-template-columns: 1fr; }
+  .import-panel { grid-template-columns: 1fr; }
+  .stat-strip { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .stat-cell:nth-child(4) { border-left: 0; }
+  .stat-cell:nth-child(n+4) { border-top: 1px solid var(--color-border); }
+  .result-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 720px) {
+  .grid2, .grid3, .lib-grid { grid-template-columns: 1fr; }
+  .practice-toolbar .field { min-width: 130px; flex: 1 1 130px; }
+  .toolbar-end { margin-left: 0; }
+  .lesson-row { grid-template-columns: minmax(0, 1fr) auto; }
+  .lesson-best { display: none; }
+  .kbd-wrap { overflow-x: auto; justify-content: flex-start; padding-bottom: var(--sp-2); }
+  .kbd-row { min-width: 520px; }
+  .practice-stage { padding: var(--sp-4); }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  .ch.cur::before, .game-buffer .caret2 { animation: none; opacity: 1; }
+  .view.active { animation: none; }
+}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">跳到主内容</a>
+<noscript><p class="small muted" style="padding: 12px 16px">本工作台需要启用 JavaScript 才能运行。</p></noscript>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="2.5" y="5.5" width="19" height="13" rx="2.5"/><path d="M6.5 9.5h.01M10.5 9.5h.01M14.5 9.5h.01M18 9.5h.01M6.5 13h.01M18 13h.01M9 13h6"/>
+  </symbol>
+  <symbol id="i-keyboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8"/>
+  </symbol>
+  <symbol id="i-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+  </symbol>
+  <symbol id="i-target" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/>
+  </symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+  </symbol>
+  <symbol id="i-gamepad" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="2" y="6" width="20" height="12" rx="4"/><path d="M7 10v4M5 12h4M15.5 11h.01M18 13h.01"/>
+  </symbol>
+  <symbol id="i-clipboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M9 2h6a1 1 0 0 1 1 1v2H8V3a1 1 0 0 1 1-1z"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12.5l2 2 4-4.5"/>
+  </symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 3v18h18"/><path d="M7 14l3.5-3.5 3 3L20 7"/>
+  </symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>
+  </symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>
+  </symbol>
+  <symbol id="i-volume" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M11 5L6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/>
+  </symbol>
+  <symbol id="i-mute" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M11 5L6 9H2v6h4l5 4z"/><path d="M22 9l-6 6M16 9l6 6"/>
+  </symbol>
+  <symbol id="i-sliders" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>
+  </symbol>
+  <symbol id="i-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/>
+  </symbol>
+  <symbol id="i-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M6 3.5l13 8.5-13 8.5z"/>
+  </symbol>
+  <symbol id="i-reset" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M1.5 4v6h6"/><path d="M3.6 15a9 9 0 1 0 2-9.4L1.5 10"/>
+  </symbol>
+  <symbol id="i-shuffle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M16 3h5v5"/><path d="M4 20L21 3"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/>
+  </symbol>
+  <symbol id="i-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M13 2L3 14h9l-1 8 10-12h-9z"/>
+  </symbol>
+  <symbol id="i-eyeoff" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M17.9 17.9A10.4 10.4 0 0 1 12 20C5.5 20 1 12 1 12a18.5 18.5 0 0 1 5.1-6.3M9.9 4.2A10.5 10.5 0 0 1 12 4c6.5 0 11 8 11 8a18.6 18.6 0 0 1-2.1 3.2M14.1 14.1a3 3 0 1 1-4.2-4.2"/><path d="M1 1l22 22"/>
+  </symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V4s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7"/>
+  </symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 5v14M5 12h14"/>
+  </symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+  </symbol>
+  <symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/>
+  </symbol>
+  <symbol id="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M18 6L6 18M6 6l12 12"/>
+  </symbol>
+  <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20 6L9 17l-5-5"/>
+  </symbol>
+  <symbol id="i-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/>
+  </symbol>
+  <symbol id="i-arrowright" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M5 12h14M13 6l6 6-6 6"/>
+  </symbol>
+</svg>
+
+<div class="app">
+  <aside class="sidebar" data-component="sidebar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"><svg width="20" height="20"><use href="#i-logo"/></svg></span>
+      <div>
+        <div class="brand-name">键程</div>
+        <div class="brand-sub">TYPING STUDIO</div>
+      </div>
+    </div>
+    <nav class="nav" aria-label="主导航" data-component="nav">
+      <span class="nav-label">工作区</span>
+      <button class="nav-item active" type="button" data-view="practice"><svg aria-hidden="true"><use href="#i-keyboard"/></svg>练习模式<span class="ni-hint">Alt 1</span></button>
+      <button class="nav-item" type="button" data-view="lessons"><svg aria-hidden="true"><use href="#i-book"/></svg>分级课程<span class="ni-hint">Alt 2</span></button>
+      <button class="nav-item" type="button" data-view="training"><svg aria-hidden="true"><use href="#i-target"/></svg>专项训练<span class="ni-hint">Alt 3</span></button>
+      <button class="nav-item" type="button" data-view="library"><svg aria-hidden="true"><use href="#i-folder"/></svg>素材库<span class="ni-hint">Alt 4</span></button>
+      <button class="nav-item" type="button" data-view="game"><svg aria-hidden="true"><use href="#i-gamepad"/></svg>单词雨<span class="ni-hint">Alt 5</span></button>
+      <button class="nav-item" type="button" data-view="exam"><svg aria-hidden="true"><use href="#i-clipboard"/></svg>考试模拟<span class="ni-hint">Alt 6</span></button>
+      <button class="nav-item" type="button" data-view="stats"><svg aria-hidden="true"><use href="#i-chart"/></svg>数据统计<span class="ni-hint">Alt 7</span></button>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="side-actions">
+        <button class="icon-btn" id="themeToggle" type="button" aria-label="切换深浅主题" title="切换深浅主题"><svg aria-hidden="true"><use href="#i-sun"/></svg></button>
+        <button class="icon-btn" id="soundBtnSide" type="button" aria-label="开关键击音效" title="开关键击音效"><svg aria-hidden="true"><use href="#i-volume"/></svg></button>
+        <button class="icon-btn" id="settingsOpen" type="button" aria-label="打开练习偏好" title="练习偏好"><svg aria-hidden="true"><use href="#i-sliders"/></svg></button>
+        <button class="icon-btn" id="shortcutOpen" type="button" aria-label="查看键盘快捷键" title="键盘快捷键"><svg aria-hidden="true"><use href="#i-list"/></svg></button>
+      </div>
+      <p class="side-meta">数据保存在本机浏览器<br><span id="sideTotals">0 次练习</span></p>
+    </div>
+  </aside>
+
+  <main class="main" id="main" data-component="main">
+    <section class="view active" id="view-practice" data-view="practice" data-component="practice" data-od-id="view-practice">
+      <div class="practice-shell">
+        <div class="practice-toolbar" data-component="practice-toolbar">
+          <div class="field">
+            <label for="lessonSelect">练习内容</label>
+            <select class="select" id="lessonSelect"></select>
+          </div>
+          <div class="toolbar-toggles">
+            <button class="toggle" id="optStrict" type="button" aria-pressed="false"><span class="dot"></span>严格模式</button>
+            <button class="toggle" id="optKbd" type="button" aria-pressed="true"><span class="dot"></span>虚拟键盘</button>
+            <button class="toggle" id="optSound" type="button" aria-pressed="true"><span class="dot"></span>键音</button>
+          </div>
+          <div class="toolbar-end">
+            <button class="btn btn-ghost btn-sm" id="restartBtn" type="button"><svg aria-hidden="true"><use href="#i-reset"/></svg>重开</button>
+            <button class="btn btn-primary" id="startBtn" type="button"><svg aria-hidden="true"><use href="#i-play"/></svg>开始练习</button>
+          </div>
+        </div>
+        <div class="practice-stage" id="practiceStage" data-component="practice-stage">
+          <p class="practice-text" id="practiceText" aria-label="练习文本"></p>
+          <input class="hidden-input" id="typeInput" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="打字输入区" />
+          <div class="stage-overlay" id="stageOverlay"></div>
+        </div>
+        <div class="practice-meta">
+          <span class="pin" id="metaProgress">0 / 0</span>
+          <span class="pin" id="metaLive">输入即开始计时</span>
+          <span class="pin" id="metaSource">课程 · 基础键位</span>
+        </div>
+        <div class="kbd-wrap" id="kbdWrap" data-component="virtual-keyboard" aria-hidden="true"></div>
+        <section class="result-panel" id="resultPanel" data-component="result-panel" hidden>
+          <header class="result-head" data-component="result-head">
+            <h3 class="result-title" id="resTitle">本次结果</h3>
+            <div class="row"><span class="pill" id="resPill">完成</span><span class="small muted num" id="resTime"></span></div>
+          </header>
+          <div class="result-grid" id="resultGrid"></div>
+          <div>
+            <div class="row-between"><span class="small muted">错误明细（最多 12 条）</span><button class="btn btn-ghost btn-sm" id="resultRetry" type="button"><svg aria-hidden="true"><use href="#i-reset"/></svg>再练一遍</button></div>
+            <div class="err-list" id="resErrList" style="margin-top: var(--sp-3)"></div>
+          </div>
+          <div class="weak-row" id="resWeakRow"></div>
+        </section>
+      </div>
+    </section>
+
+    <section class="view" id="view-lessons" data-view="lessons" data-component="lessons" data-od-id="view-lessons">
+      <header class="view-head" data-component="lessons-head">
+        <div>
+          <div class="eyebrow">分级课程</div>
+          <h2 class="view-title">从键位到文章的进阶路线</h2>
+          <p class="view-desc">四个级别依次推进：基础键位、英文单词、中文短句、文章段落。每课取历史最佳成绩计算星级，可随时重练刷新记录。</p>
+        </div>
+        <div class="row"><button class="btn btn-secondary" id="continueBtn" type="button"><svg aria-hidden="true"><use href="#i-play"/></svg>继续上次</button></div>
+      </header>
+      <div class="stack" id="levelBlocks"></div>
+    </section>
+
+    <section class="view" id="view-training" data-view="training" data-component="training" data-od-id="view-training">
+      <header class="view-head" data-component="training-head">
+        <div>
+          <div class="eyebrow">专项训练</div>
+          <h2 class="view-title">集中强化薄弱环节</h2>
+          <p class="view-desc">基于练习记录自动生成训练内容：集中操练高频错键、限时冲刺提升速度，或用盲打检验肌肉记忆。</p>
+        </div>
+      </header>
+      <div class="train-grid">
+        <article class="card train-card" data-component="weak-keys">
+          <div class="train-icon" aria-hidden="true"><svg><use href="#i-target"/></svg></div>
+          <h3 class="card-title">易错键强化</h3>
+          <p class="card-desc">按错误次数排序，把最常打错的键位编成组合序列反复练习。</p>
+          <div class="weak-grid" id="weakGrid"></div>
+          <button class="btn btn-primary btn-sm" id="weakStart" type="button"><svg aria-hidden="true"><use href="#i-shuffle"/></svg>生成练习</button>
+        </article>
+        <article class="card train-card" data-component="speed-training">
+          <div class="train-icon" aria-hidden="true"><svg><use href="#i-zap"/></svg></div>
+          <h3 class="card-title">提速冲刺</h3>
+          <p class="card-desc">选定时长，用高频词表连续输入，专注提升净速度与节奏稳定性。</p>
+          <div class="duration-row"><div class="seg" id="speedDurations" role="group" aria-label="冲刺时长">
+            <button type="button" data-sec="60">60 秒</button><button type="button" data-sec="120" class="active">120 秒</button><button type="button" data-sec="180">180 秒</button>
+          </div></div>
+          <button class="btn btn-secondary btn-sm" id="speedStart" type="button">开始冲刺</button>
+        </article>
+        <article class="card train-card" data-component="blind-typing">
+          <div class="train-icon" aria-hidden="true"><svg><use href="#i-eyeoff"/></svg></div>
+          <h3 class="card-title">盲打强化</h3>
+          <p class="card-desc">隐藏文本与键盘，只凭节奏输入，结束后整体对照正确率。</p>
+          <div class="duration-row">
+            <button class="toggle" id="blindKbd" type="button" aria-pressed="true"><span class="dot"></span>隐藏键盘</button>
+            <button class="toggle" id="blindText" type="button" aria-pressed="true"><span class="dot"></span>隐藏文本</button>
+          </div>
+          <button class="btn btn-secondary btn-sm" id="blindStart" type="button">进入盲打模式</button>
+        </article>
+      </div>
+      <section class="card" data-component="weak-board" style="margin-top: var(--sp-4)">
+        <div class="row-between">
+          <div>
+            <h3 class="card-title">弱键排行</h3>
+            <p class="card-desc">错误率最高的 10 个键位，随每次练习自动更新。</p>
+          </div>
+          <span class="pill plain">统计自最近 30 次记录</span>
+        </div>
+        <div class="stack" id="weakBoard" style="margin-top: var(--sp-2)"></div>
+      </section>
+    </section>
+
+    <section class="view" id="view-library" data-view="library" data-component="library" data-od-id="view-library">
+      <header class="view-head" data-component="library-head">
+        <div>
+          <div class="eyebrow">素材库</div>
+          <h2 class="view-title">换点真实材料继续练</h2>
+          <p class="view-desc">范文、代码、公文、诗词与专业词汇，全部选自公开与原创文本；也可以粘贴自己的材料，保存后随时调用。</p>
+        </div>
+      </header>
+      <div class="tabs" id="libTabs" role="tablist" aria-label="素材分类" data-component="lib-tabs">
+        <button class="tab active" type="button" role="tab" aria-selected="true" data-cat="article">热门文章</button>
+        <button class="tab" type="button" role="tab" aria-selected="false" data-cat="code">代码片段</button>
+        <button class="tab" type="button" role="tab" aria-selected="false" data-cat="doc">公文范本</button>
+        <button class="tab" type="button" role="tab" aria-selected="false" data-cat="poem">诗词名篇</button>
+        <button class="tab" type="button" role="tab" aria-selected="false" data-cat="pro">专业词汇</button>
+      </div>
+      <div class="lib-grid" id="libGrid" data-component="lib-grid"></div>
+      <section class="card" data-component="import-panel" style="margin-top: var(--sp-4)">
+        <div class="row-between">
+          <div>
+            <h3 class="card-title">自定义素材</h3>
+            <p class="card-desc">粘贴任何文本（中英文皆可），保存后会出现在素材库与练习内容下拉框中。</p>
+          </div>
+          <span class="pill plain" id="customCount">0 条</span>
+        </div>
+        <hr class="divider" />
+        <div class="import-panel">
+          <div class="field">
+            <label for="importText">粘贴练习文本</label>
+            <textarea class="textarea" id="importText" placeholder="在此粘贴文章、代码或任意想练习的文本"></textarea>
+            <div class="hint">建议 80 至 800 字；超长内容会按段落拆分为多份素材。</div>
+          </div>
+          <div class="stack">
+            <div class="field">
+              <label for="importTitle">素材标题</label>
+              <input class="input" id="importTitle" type="text" placeholder="例：产品需求文档节选" />
+              <div class="hint">留空则自动命名为「自定义素材」加序号。</div>
+            </div>
+            <div class="row">
+              <button class="btn btn-primary" id="importSave" type="button"><svg aria-hidden="true"><use href="#i-plus"/></svg>保存到素材库</button>
+              <button class="btn btn-ghost" id="importClear" type="button">清空输入</button>
+            </div>
+          </div>
+        </div>
+        <div id="customList" style="margin-top: var(--sp-4)"></div>
+      </section>
+    </section>
+
+    <section class="view" id="view-game" data-view="game" data-component="game" data-od-id="view-game">
+      <header class="view-head" data-component="game-head">
+        <div>
+          <div class="eyebrow">单词雨</div>
+          <h2 class="view-title">边玩边练的快速反应训练</h2>
+          <p class="view-desc">单词从顶部下落，完整键入即可击落；漏掉三个单词游戏即结束。适合热身与节奏感训练。</p>
+        </div>
+      </header>
+      <div class="game-shell">
+        <div class="game-hud" data-component="game-hud">
+          <div><span class="stat-k">得分</span><span class="stat-v num" id="gScore">0</span></div>
+          <div><span class="stat-k">连击</span><span class="stat-v num" id="gCombo">0</span></div>
+          <div><span class="stat-k">击落</span><span class="stat-v num" id="gKills">0</span></div>
+          <div><span class="stat-k">生命</span><span class="lives" id="gLives"><i></i><i></i><i></i></span></div>
+        </div>
+        <div class="game-arena" id="gameArena" data-component="game-arena">
+          <div class="baseline" aria-hidden="true"></div>
+          <div class="game-overlay" id="gameOverlay">
+            <div class="overlay-card">
+              <svg width="22" height="22" style="color: var(--color-muted)" aria-hidden="true"><use href="#i-gamepad"/></svg>
+              <div>
+                <div class="result-title" id="goTitle">单词雨</div>
+                <p class="small muted" id="goDesc">输入落下的单词（不区分大小写），完整键入即击落。</p>
+              </div>
+              <button class="btn btn-primary" id="goStart" type="button"><svg aria-hidden="true"><use href="#i-play"/></svg>开始游戏</button>
+              <span class="small muted">按 <span class="kbd">Esc</span> 随时暂停</span>
+            </div>
+          </div>
+        </div>
+        <div class="game-foot" data-component="game-foot">
+          <div class="game-buffer" id="gameBuffer"><span class="caret2"></span></div>
+          <div class="row">
+            <span class="small muted">难度</span>
+            <div class="seg" id="gameDifficulty" role="group" aria-label="游戏难度">
+              <button type="button" data-lv="easy">悠闲</button>
+              <button type="button" data-lv="normal" class="active">标准</button>
+              <button type="button" data-lv="hard">极速</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="view-exam" data-view="exam" data-component="exam" data-od-id="view-exam">
+      <header class="view-head" data-component="exam-head">
+        <div>
+          <div class="eyebrow">考试模拟</div>
+          <h2 class="view-title">像正式测评一样完成一段录入</h2>
+          <p class="view-desc">计时作答，过程中不显示即时对错；交卷后生成包含速度、正确率、评级与逐字错误明细的成绩单。</p>
+        </div>
+      </header>
+      <div class="exam-shell">
+        <section class="card" id="examSetup" data-component="exam-setup">
+          <h3 class="card-title">设置试卷</h3>
+          <p class="card-desc">选择时长与范围，开始后计时自动运行，可随时提前交卷。</p>
+          <hr class="divider" />
+          <div class="grid2">
+            <div class="field">
+              <label id="examLenLabel">考试时长</label>
+              <div class="seg" id="examLen" role="group" aria-labelledby="examLenLabel">
+                <button type="button" data-min="3">3 分钟</button>
+                <button type="button" data-min="5" class="active">5 分钟</button>
+                <button type="button" data-min="10">10 分钟</button>
+              </div>
+            </div>
+            <div class="field">
+              <label for="examScope">考试范围</label>
+              <select class="select" id="examScope">
+                <option value="mix">综合（英文 + 中文）</option>
+                <option value="en">英文段落</option>
+                <option value="zh">中文段落</option>
+                <option value="code">代码片段</option>
+              </select>
+            </div>
+          </div>
+          <div class="stack small muted" style="margin-top: var(--sp-4)">
+            <span>1. 倒计时开始后即可输入，文本自动滚屏；</span>
+            <span>2. 考试中不显示即时对错，允许退格修改；</span>
+            <span>3. 计时结束或提前交卷后生成成绩单。</span>
+          </div>
+          <div class="row" style="margin-top: var(--sp-4)">
+            <button class="btn btn-primary" id="examStartBtn" type="button"><svg aria-hidden="true"><use href="#i-flag"/></svg>开始考试</button>
+          </div>
+        </section>
+        <div id="examRun" class="stack" hidden>
+          <section class="card" data-component="exam-hud">
+            <div class="exam-timer-wrap">
+              <div>
+                <span class="stat-k">剩余时间</span>
+                <div class="exam-timer" id="examTimer">05:00</div>
+              </div>
+              <div class="row">
+                <span class="pin small muted" id="examCount">已输入 0 字</span>
+                <button class="btn btn-secondary" id="examSubmitBtn" type="button">提前交卷</button>
+              </div>
+            </div>
+            <div class="progress" style="margin-top: var(--sp-4)"><i id="examProgressBar"></i></div>
+          </section>
+          <div class="practice-stage" id="examStage" data-component="exam-stage">
+            <p class="practice-text" id="examText" aria-label="考试文本"></p>
+            <input class="hidden-input" id="examInput" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="考试输入区" />
+          </div>
+          <div class="practice-meta">
+            <span class="pin">考试进行中 · 不显示对错 · 退格可修改</span>
+            <span class="pin num" id="examRate">0 字 / 分</span>
+          </div>
+        </div>
+        <section class="report-card" id="examReport" data-component="exam-report" hidden>
+          <div class="row-between">
+            <div>
+              <div class="eyebrow">成绩单</div>
+              <h3 class="result-title">模拟考试结果</h3>
+              <p class="small muted" id="reportMeta">综合 · 5 分钟</p>
+            </div>
+            <div class="grade-badge" id="reportGrade">A<small>评级</small></div>
+          </div>
+          <hr class="divider" />
+          <div class="result-grid" id="reportGrid"></div>
+          <div style="margin-top: var(--sp-4)">
+            <div class="row-between"><h4 class="card-title">错误明细</h4><span class="pill error" id="reportErrCount">0 处</span></div>
+            <div class="err-list" id="reportErrs" style="margin-top: var(--sp-3)"></div>
+          </div>
+          <div class="row-between" style="margin-top: var(--sp-4)">
+            <span class="small muted">成绩仅供自我参考，不构成任何资质认证。</span>
+            <div class="row">
+              <button class="btn btn-ghost btn-sm" id="reportRetry" type="button">再考一次</button>
+              <button class="btn btn-primary btn-sm" id="reportPractice" type="button">用这份试卷练习</button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section class="view" id="view-stats" data-view="stats" data-component="stats" data-od-id="view-stats">
+      <header class="view-head" data-component="stats-head">
+        <div>
+          <div class="eyebrow">数据面板</div>
+          <h2 class="view-title">速度、正确率与弱键一目了然</h2>
+          <p class="view-desc">所有指标来自本机练习记录，不联网、不上传。从这里决定下一个阶段练什么。</p>
+        </div>
+        <div class="row">
+          <button class="btn btn-ghost btn-sm" id="exportBtn" type="button"><svg aria-hidden="true"><use href="#i-download"/></svg>导出记录</button>
+          <button class="btn btn-danger btn-sm" id="wipeBtn" type="button"><svg aria-hidden="true"><use href="#i-trash"/></svg>清空数据</button>
+        </div>
+      </header>
+      <div class="stat-strip" data-component="kpi-strip">
+        <div class="stat-cell"><span class="stat-k">平均速度</span><span class="stat-v" id="kpiWpm">—</span><span class="stat-sub">最近 30 次</span></div>
+        <div class="stat-cell"><span class="stat-k">平均正确率</span><span class="stat-v" id="kpiAcc">—</span><span class="stat-sub">最近 30 次</span></div>
+        <div class="stat-cell"><span class="stat-k">累计练习</span><span class="stat-v" id="kpiTime">0<small> 分钟</small></span><span class="stat-sub">全部记录</span></div>
+        <div class="stat-cell"><span class="stat-k">练习次数</span><span class="stat-v" id="kpiSessions">0</span><span class="stat-sub">含游戏与考试</span></div>
+        <div class="stat-cell"><span class="stat-k">最佳速度</span><span class="stat-v" id="kpiBest">—</span><span class="stat-sub">历史峰值</span></div>
+      </div>
+      <div class="grid2" style="margin-top: var(--sp-4)">
+        <section class="card" data-component="trend-card">
+          <div class="row-between">
+            <div><h3 class="card-title">速度与正确率趋势</h3><p class="card-desc">最近 14 次练习，双轴归一化展示。</p></div>
+            <div class="legend"><span><i class="l1"></i>速度</span><span><i class="l2"></i>正确率</span></div>
+          </div>
+          <svg class="chart-svg" id="trendChart" viewBox="0 0 640 240" role="img" aria-label="速度与正确率趋势折线图" style="margin-top: var(--sp-4)"></svg>
+          <table class="visually-hidden" id="trendTable"></table>
+          <div class="empty-state" id="trendEmpty" hidden style="margin-top: var(--sp-3)">
+            <svg aria-hidden="true"><use href="#i-info"/></svg>
+            <p class="small">完成两次以上练习后，这里会绘制速度与正确率的变化趋势。</p>
+          </div>
+        </section>
+        <section class="card" data-component="error-types">
+          <div class="row-between">
+            <div><h3 class="card-title">错误类型分布</h3><p class="card-desc">按最近 30 次记录归类错误原因。</p></div>
+          </div>
+          <div class="typebars" id="typeBars" style="margin-top: var(--sp-4)"></div>
+        </section>
+      </div>
+      <section class="card" data-component="heatmap-card" style="margin-top: var(--sp-4)">
+        <div class="row-between">
+          <div><h3 class="card-title">键位热力图</h3><p class="card-desc">颜色越深表示该键错误越多（悬停查看明细）。</p></div>
+          <span class="kbd-legend small muted"><i style="background: var(--color-error-soft)"></i>少 · 多 <i style="background: var(--color-error)"></i></span>
+        </div>
+        <div style="overflow-x: auto; margin-top: var(--sp-4)"><div class="heat-kbd" id="heatKbd" data-component="heatmap"></div></div>
+      </section>
+      <section class="card" data-component="weak-table-card" style="margin-top: var(--sp-4)">
+        <div class="row-between">
+          <div><h3 class="card-title">弱键排行</h3><p class="card-desc">错误次数最多的键位与对应错误率。</p></div>
+        </div>
+        <div style="overflow-x: auto; margin-top: var(--sp-2)">
+          <table class="ds-table weak-table">
+            <thead><tr><th>键位</th><th class="num-col">击键</th><th class="num-col">错误</th><th class="num-col">错误率</th><th>占比</th></tr></thead>
+            <tbody id="weakTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+      <section class="card" data-component="history-card" style="margin-top: var(--sp-4)">
+        <div class="row-between">
+          <div><h3 class="card-title">最近记录</h3><p class="card-desc">最近 12 次练习、游戏与考试。</p></div>
+          <span class="pill plain" id="historyCount">0 条</span>
+        </div>
+        <div style="overflow-x: auto; margin-top: var(--sp-2)">
+          <table class="ds-table">
+            <thead><tr><th>时间</th><th>模式</th><th>内容</th><th class="num-col">速度</th><th class="num-col">正确率</th><th class="num-col">用时</th></tr></thead>
+            <tbody id="historyBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+  </main>
+</div>
+
+<div class="modal-backdrop" id="settingsModal" hidden data-component="settings-modal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+    <div class="modal-head" data-component="settings-head">
+      <div>
+        <h3 class="modal-title" id="settingsTitle">练习偏好</h3>
+        <p class="small muted">调整后立即生效，保存在本机浏览器。</p>
+      </div>
+      <button class="icon-btn" data-close-modal type="button" aria-label="关闭设置"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+    </div>
+    <div class="field">
+      <label id="setThemeLabel">界面主题</label>
+      <div class="seg" id="setTheme" role="group" aria-labelledby="setThemeLabel">
+        <button type="button" data-theme-val="light" class="active">浅色</button>
+        <button type="button" data-theme-val="dark">深色</button>
+      </div>
+    </div>
+    <div class="field">
+      <label id="setSizeLabel">练习字号</label>
+      <div class="seg" id="setSize" role="group" aria-labelledby="setSizeLabel">
+        <button type="button" data-val="0.88">小</button>
+        <button type="button" data-val="1" class="active">中</button>
+        <button type="button" data-val="1.18">大</button>
+      </div>
+    </div>
+    <div class="field">
+      <label id="setDensityLabel">界面密度</label>
+      <div class="seg" id="setDensity" role="group" aria-labelledby="setDensityLabel">
+        <button type="button" data-val="0.86">紧凑</button>
+        <button type="button" data-val="1" class="active">标准</button>
+        <button type="button" data-val="1.14">宽松</button>
+      </div>
+    </div>
+    <div class="field">
+      <label id="setRadiusLabel">圆角风格</label>
+      <div class="seg" id="setRadius" role="group" aria-labelledby="setRadiusLabel">
+        <button type="button" data-val="4">硬朗</button>
+        <button type="button" data-val="12" class="active">默认</button>
+        <button type="button" data-val="20">圆润</button>
+      </div>
+    </div>
+    <div class="row">
+      <button class="toggle" id="optSound2" type="button" aria-pressed="true"><span class="dot"></span>击键音效</button>
+      <button class="toggle" id="optStrict2" type="button" aria-pressed="false"><span class="dot"></span>严格模式</button>
+      <button class="toggle" id="optKbd2" type="button" aria-pressed="true"><span class="dot"></span>虚拟键盘</button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="resetPrefs" type="button">恢复默认</button>
+      <button class="btn btn-primary" data-close-modal type="button">完成</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="shortcutModal" hidden data-component="shortcut-modal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="shortcutTitle">
+    <div class="modal-head" data-component="shortcut-head">
+      <div>
+        <h3 class="modal-title" id="shortcutTitle">键盘快捷键</h3>
+        <p class="small muted">在页面任意位置按下即可触发（输入框内除外）。</p>
+      </div>
+      <button class="icon-btn" data-close-modal type="button" aria-label="关闭快捷键列表"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+    </div>
+    <div class="shortcut-list">
+      <span class="kbd">Alt + 1…7</span><span>在七个主视图之间切换</span>
+      <span class="kbd">Ctrl + Enter</span><span>重新开始当前练习或考试</span>
+      <span class="kbd">Ctrl + M</span><span>开关键击音效</span>
+      <span class="kbd">Ctrl + K</span><span>显示或隐藏虚拟键盘</span>
+      <span class="kbd">Esc</span><span>关闭弹层 · 暂停游戏 · 退出输入区</span>
+      <span class="kbd">Tab</span><span>依次聚焦侧栏与工具按钮</span>
+    </div>
+    <div class="modal-actions"><button class="btn btn-primary" data-close-modal type="button">知道了</button></div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="confirmModal" hidden data-component="confirm-modal">
+  <div class="modal" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <div class="modal-head" data-component="confirm-head">
+      <div>
+        <h3 class="modal-title" id="confirmTitle">确认操作</h3>
+        <p class="small muted" id="confirmDesc"></p>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" id="confirmNo" type="button">取消</button>
+      <button class="btn btn-danger" id="confirmYes" type="button">确认</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap" aria-live="polite"></div>
+<script>
+(function () {
+'use strict';
+
+/* ════════════ 1. 基础工具 ════════════ */
+var $ = function (sel, root) { return (root || document).querySelector(sel); };
+var $$ = function (sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); };
+function on(el, ev, fn, opt) { if (el) el.addEventListener(ev, fn, opt || false); }
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
+function rand(n) { return Math.floor(Math.random() * n); }
+function pick(arr) { return arr[rand(arr.length)]; }
+function shuffle(arr) {
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) { var j = rand(i + 1); var t = a[i]; a[i] = a[j]; a[j] = t; }
+  return a;
+}
+function fmtNum(v, d) {
+  if (v == null || !isFinite(v)) return '—';
+  var f = Math.pow(10, d == null ? 0 : d);
+  return String(Math.round(v * f) / f);
+}
+function pad2(n) { return (n < 10 ? '0' : '') + n; }
+function fmtClock(sec) { sec = Math.max(0, Math.round(sec)); return pad2(Math.floor(sec / 60)) + ':' + pad2(sec % 60); }
+function fmtWhen(ts) {
+  var d = new Date(ts);
+  return (d.getMonth() + 1) + ' 月 ' + d.getDate() + ' 日 ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+}
+function fmtDur(sec) {
+  sec = Math.round(sec);
+  if (sec < 60) return sec + ' 秒';
+  var m = Math.floor(sec / 60);
+  if (m < 60) return m + ' 分 ' + (sec % 60 ? (sec % 60) + ' 秒' : '');
+  return Math.floor(m / 60) + ' 小时 ' + (m % 60) + ' 分';
+}
+
+/* ════════════ 2. 本地存储 ════════════ */
+var STORE_KEY = 'jiancheng.typing.v1';
+var storeOk = true;
+var memoryStore = null;
+try { window.localStorage.setItem('__probe__', '1'); window.localStorage.removeItem('__probe__'); }
+catch (err) { storeOk = false; }
+
+function defaultState() {
+  return {
+    version: 1,
+    settings: { theme: '', sound: true, strict: false, showKbd: true, size: 1, density: 1, radius: 12 },
+    history: [],
+    keyStats: {},
+    customTexts: [],
+    lessonBest: {},
+    totals: { sec: 0, sessions: 0, chars: 0 }
+  };
+}
+function clone(o) { return JSON.parse(JSON.stringify(o)); }
+function deepMerge(base, extra) {
+  if (extra == null) return base;
+  if (Array.isArray(base) || base === null || typeof base !== 'object') return extra;
+  if (typeof extra !== 'object' || Array.isArray(extra)) return extra;
+  Object.keys(extra).forEach(function (k) {
+    if (base[k] && typeof base[k] === 'object' && !Array.isArray(base[k])) base[k] = deepMerge(base[k], extra[k]);
+    else base[k] = extra[k];
+  });
+  return base;
+}
+var state = null;
+function loadState() {
+  var raw = null;
+  try { raw = storeOk ? window.localStorage.getItem(STORE_KEY) : memoryStore; } catch (err) { raw = memoryStore; }
+  if (raw) {
+    try { state = deepMerge(defaultState(), JSON.parse(raw)); return; } catch (err) { /* 数据损坏则重置 */ }
+  }
+  state = defaultState();
+}
+function saveState() {
+  var raw = JSON.stringify(state);
+  try { if (storeOk) { window.localStorage.setItem(STORE_KEY, raw); return; } } catch (err) { /* 配额受限 */ }
+  memoryStore = raw;
+}
+
+/* ════════════ 3. 主题与偏好 ════════════ */
+function effectiveTheme() {
+  return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+}
+function setSeg(sel, attr, val) {
+  $$(sel + ' button').forEach(function (b) { b.classList.toggle('active', b.getAttribute(attr) === String(val)); });
+}
+function applyTheme(theme) {
+  var t = theme || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', t);
+  var use = $('#themeToggle use');
+  if (use) use.setAttribute('href', t === 'dark' ? '#i-moon' : '#i-sun');
+}
+function syncPrefUI() {
+  var s = state.settings;
+  [['#optStrict', s.strict], ['#optKbd', s.showKbd], ['#optSound', s.sound],
+   ['#optStrict2', s.strict], ['#optKbd2', s.showKbd], ['#optSound2', s.sound]].forEach(function (p) {
+    var el = $(p[0]);
+    if (el) el.setAttribute('aria-pressed', p[1] ? 'true' : 'false');
+  });
+  var su = $('#soundBtnSide use');
+  if (su) su.setAttribute('href', s.sound ? '#i-volume' : '#i-mute');
+  setSeg('#setTheme', 'data-theme-val', effectiveTheme());
+  setSeg('#setSize', 'data-val', s.size);
+  setSeg('#setDensity', 'data-val', s.density);
+  setSeg('#setRadius', 'data-val', s.radius);
+  var kbdWrap = $('#kbdWrap');
+  if (kbdWrap && typeof currentEngine !== 'undefined' && currentEngine) kbdWrap.hidden = !s.showKbd || !!currentEngine.hideKbd;
+}
+function applyPrefs() {
+  var s = state.settings;
+  var st = document.documentElement.style;
+  st.setProperty('--seed-text-scale', String(s.size || 1));
+  st.setProperty('--seed-density', String(s.density || 1));
+  st.setProperty('--seed-radius', (s.radius || 12) + 'px');
+  applyTheme(s.theme || '');
+  syncPrefUI();
+}
+function setPref(key, val, silent) {
+  state.settings[key] = val;
+  saveState();
+  applyPrefs();
+  if (!silent && key === 'sound') toast(val ? '键击音效已开启' : '键击音效已关闭');
+}
+
+/* ════════════ 4. 音效 ════════════ */
+var audioCtx = null;
+function ensureAudio() {
+  if (!state.settings.sound) return null;
+  try {
+    if (!audioCtx) {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      audioCtx = new AC();
+    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+  } catch (err) { return null; }
+}
+function blip(kind) {
+  if (!state.settings.sound) return;
+  var ctx = ensureAudio();
+  if (!ctx) return;
+  try {
+    var t = ctx.currentTime;
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.type = kind === 'err' ? 'square' : 'sine';
+    osc.frequency.value = kind === 'err' ? 150 : (kind === 'hit' ? 640 : 320 + rand(50));
+    gain.gain.setValueAtTime(kind === 'err' ? 0.1 : 0.06, t);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + (kind === 'err' ? 0.15 : 0.05));
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(t);
+    osc.stop(t + 0.2);
+  } catch (err) { /* 忽略音频异常 */ }
+}
+
+/* ════════════ 5. 提示与弹层 ════════════ */
+function toast(msg, kind) {
+  var wrap = $('#toastWrap');
+  if (!wrap) return;
+  var el = document.createElement('div');
+  el.className = 'toast' + (kind === 'warn' ? ' warn' : '');
+  el.textContent = msg;
+  wrap.appendChild(el);
+  window.setTimeout(function () {
+    el.style.opacity = '0';
+    el.style.transition = 'opacity 200ms ease';
+    window.setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 240);
+  }, 2600);
+}
+function openModal(sel) { var m = $(sel); if (m) { m.hidden = false; } }
+function closeModals() { $$('.modal-backdrop').forEach(function (m) { m.hidden = true; }); }
+var confirmCb = null;
+function askConfirm(title, desc, cb) {
+  var t = $('#confirmTitle'); var d = $('#confirmDesc');
+  if (t) t.textContent = title;
+  if (d) d.textContent = desc;
+  confirmCb = cb;
+  openModal('#confirmModal');
+}
+on(document, 'click', function (e) {
+  var t = e.target;
+  if (!t || !t.closest) return;
+  if (t.closest('[data-close-modal]')) {
+    var bd = t.closest('.modal-backdrop');
+    if (bd) bd.hidden = true;
+    return;
+  }
+  if (t.classList && t.classList.contains('modal-backdrop')) t.hidden = true;
+});
+
+/* ════════════ 6. 虚拟键盘 ════════════ */
+var KBD_ROWS = [
+  [['`', '~'], ['1', '!'], ['2', '@'], ['3', '#'], ['4', '$'], ['5', '%'], ['6', '^'], ['7', '&'], ['8', '*'], ['9', '('], ['0', ')'], ['-', '_'], ['=', '+'], ['Backspace', '回删', 'w-xwide']],
+  [['Tab', 'Tab', 'w-wide'], ['q'], ['w'], ['e'], ['r'], ['t'], ['y'], ['u'], ['i'], ['o'], ['p'], ['[', '{'], [']', '}'], ['\\', '|']],
+  [['Caps', 'Caps', 'w-wide'], ['a'], ['s'], ['d'], ['f'], ['g'], ['h'], ['j'], ['k'], ['l'], [';', ':'], ["'", '"'], ['Enter', '回车', 'w-xwide']],
+  [['Shift', 'Shift', 'w-xwide'], ['z'], ['x'], ['c'], ['v'], ['b'], ['n'], ['m'], [',', '<'], ['.', '>'], ['/', '?'], ['Shift', 'Shift', 'w-xwide']],
+  [['Control', 'Ctrl', 'w-wide'], ['Alt', 'Alt', 'w-wide'], ['Space', '空格', 'w-space'], ['Alt', 'Alt', 'w-wide'], ['Control', 'Ctrl', 'w-wide']]
+];
+var CHAR_TO_KEY = {};
+var keyElsByBase = {};
+function buildKeyMaps() {
+  KBD_ROWS.forEach(function (row) {
+    row.forEach(function (k) {
+      var base = k[0];
+      if (base.length !== 1) return;
+      CHAR_TO_KEY[base] = base;
+      if (k[1] && k[1].length === 1) CHAR_TO_KEY[k[1]] = base;
+      if (/[a-z]/.test(base)) CHAR_TO_KEY[base.toUpperCase()] = base;
+    });
+  });
+  CHAR_TO_KEY[' '] = 'Space';
+  CHAR_TO_KEY['\n'] = 'Enter';
+}
+var kbdBuilt = false;
+function buildKeyboard() {
+  var wrap = $('#kbdWrap');
+  if (!wrap || kbdBuilt) return;
+  KBD_ROWS.forEach(function (row) {
+    var rowEl = document.createElement('div');
+    rowEl.className = 'kbd-row';
+    row.forEach(function (k) {
+      var el = document.createElement('div');
+      el.className = 'key' + (k[2] ? ' ' + k[2] : '');
+      el.setAttribute('data-key', k[0]);
+      var isChar = k[0].length === 1;
+      var top = isChar ? k[0] : (k[1] || k[0]);
+      var html = '<span class="k-top">' + esc(top) + '</span>';
+      if (isChar && k[1]) html += '<span class="k-sub">' + esc(k[1]) + '</span>';
+      el.innerHTML = html;
+      if (isChar) keyElsByBase[k[0]] = el;
+      rowEl.appendChild(el);
+    });
+    wrap.appendChild(rowEl);
+  });
+  kbdBuilt = true;
+}
+var pressedTimer = null;
+function flashKey(ch) {
+  var base = CHAR_TO_KEY[ch];
+  var el = base && keyElsByBase[base];
+  if (!el) return;
+  el.classList.add('pressed');
+  window.clearTimeout(pressedTimer);
+  pressedTimer = window.setTimeout(function () { el.classList.remove('pressed'); }, 120);
+}
+var prevNextEl = null;
+function markNextKey(ch) {
+  var base = ch ? CHAR_TO_KEY[ch] : null;
+  var el = base ? keyElsByBase[base] : null;
+  if (el === prevNextEl) return;
+  if (prevNextEl) prevNextEl.classList.remove('next');
+  if (el) el.classList.add('next');
+  prevNextEl = el;
+}
+function paintKeyHeat(keyStats) {
+  $$('.kbd-wrap .key').forEach(function (el) {
+    var base = el.getAttribute('data-key');
+    if (!base || base.length !== 1) return;
+    var rec = keyStats && keyStats[base];
+    var heat = 0;
+    if (rec && rec.total >= 4 && rec.err > 0) heat = clamp((rec.err / rec.total) * 2.4, 0.08, 0.5);
+    el.style.setProperty('--heat', String(heat));
+  });
+}
+
+/* ════════════ 7. 课程数据 ════════════ */
+var COURSES = [
+  {
+    id: 'L1', no: 'LEVEL 1', name: '基础键位',
+    desc: '从基准键位出发，逐排覆盖字母、数字与常用符号。',
+    lessons: [
+      { id: 'l1-1', name: '基准键位 asdf jkl;', lang: 'en', text: 'asdf jkl; asdf jkl; ff jj dd kk ss ll aa ;; fj fj dk dk sl sl a; a; asdf jkl; fjdk slaa' },
+      { id: 'l1-2', name: '上排字符 qwer uiop', lang: 'en', text: 'qwer uiop qwer uiop rr uu ee ii ww oo qq pp ruru ejej titi ququ wiwi opop qwer uiop' },
+      { id: 'l1-3', name: '下排字符 zxcv m,./', lang: 'en', text: 'zxcv m,./ zxcv m,./ zz xx cc vv mm ,, .. // zx cv m, ./ mnbv zxcv m,./ ' },
+      { id: 'l1-4', name: '数字键排', lang: 'en', text: '123 456 789 000 147 258 369 741 852 963 1470 2580 3690 0123 4567 8901' },
+      { id: 'l1-5', name: '大写与 Shift', lang: 'en', text: 'Good Morning. Nice Day. Hello World. Read Books. Write Code. Start Now. Keep Going.' },
+      { id: 'l1-6', name: '常用标点', lang: 'en', text: 'Wait, what? It is fine: "great", (ok), [yes]; 50 - 20 = 30.' },
+      { id: 'l1-7', name: '全键位综合', lang: 'en', text: 'The quick brown fox jumps over 13 lazy dogs, then waits & watches 42 stars; it is not tired yet!' }
+    ]
+  },
+  {
+    id: 'L2', no: 'LEVEL 2', name: '英文单词',
+    desc: '高频词、长词与数字符号混合，提升连续输入的稳定性。',
+    lessons: [
+      { id: 'l2-1', name: '高频短词', lang: 'en', text: 'the and for you that with have this from they will one all would there their what about which when make like time just know take people into' },
+      { id: 'l2-2', name: '常用长词', lang: 'en', text: 'keyboard practice accuracy rhythm progress confidence remember important information environment development experience knowledge' },
+      { id: 'l2-3', name: '词组搭配', lang: 'en', text: 'as soon as; in order to; on the other hand; first of all; by the way; in fact; of course; at least; as well as' },
+      { id: 'l2-4', name: '标点混排', lang: 'en', text: '"Focus," she said, "and remember: accuracy first (then speed)."' },
+      { id: 'l2-5', name: '数字混合', lang: 'en', text: 'Order 66, Unit 7, Room 302, Version 2.5, take 15% off; call 010-8888-6666 now.' }
+    ]
+  },
+  {
+    id: 'L3', no: 'LEVEL 3', name: '中文短句',
+    desc: '使用拼音输入法练习中文录入，关注标点与中英混排。',
+    lessons: [
+      { id: 'l3-1', name: '日常短句', lang: 'zh', text: '今天天气很好，适合出门散步。中午和朋友一起吃饭，聊了很多有趣的话题。' },
+      { id: 'l3-2', name: '办公用语', lang: 'zh', text: '请各位同事在周五之前提交本周工作总结，并在文档中标注需要协同处理的事项。' },
+      { id: 'l3-3', name: '中英混排', lang: 'zh', text: '会议定在 14:30 举行，请提前 10 分钟到场，并带上笔记本与充电器。' }
+    ]
+  },
+  {
+    id: 'L4', no: 'LEVEL 4', name: '文章段落',
+    desc: '成段文字练习，目标是把速度与准确率同时带进真实场景。',
+    lessons: [
+      { id: 'l4-1', name: '散文名篇', lang: 'zh', text: '燕子去了，有再来的时候；杨柳枯了，有再青的时候；桃花谢了，有再开的时候。但是，聪明的，你告诉我，我们的日子为什么一去不复返呢？' },
+      { id: 'l4-2', name: '新闻消息', lang: 'zh', text: '据市图书馆消息，自本月起主馆开放时间延长至每晚九点。读者可通过线上平台预约座位，周末还将举办面向青少年的阅读分享活动。' },
+      { id: 'l4-3', name: '说明文段', lang: 'zh', text: '云由大量小水滴或小冰晶组成。当空气中的水汽遇到冷空气凝结，便形成了云。不同的高度与温度，造就了形态各异的云。' },
+      { id: 'l4-4', name: '中英混排', lang: 'zh', text: '在 Web 开发中，CSS 负责布局与样式，JavaScript 处理交互逻辑，HTML 提供内容结构。' }
+    ]
+  }
+];
+function allLessons() {
+  var out = [];
+  COURSES.forEach(function (lv) { lv.lessons.forEach(function (ls) { out.push(ls); }); });
+  return out;
+}
+function findLesson(id) {
+  var found = null;
+  COURSES.forEach(function (lv) { lv.lessons.forEach(function (ls) { if (ls.id === id) found = ls; }); });
+  return found;
+}
+
+/* ════════════ 8. 素材库数据 ════════════ */
+var LIB_CATS = [
+  { cat: 'article', label: '热门文章' },
+  { cat: 'code', label: '代码片段' },
+  { cat: 'doc', label: '公文范本' },
+  { cat: 'poem', label: '诗词名篇' },
+  { cat: 'pro', label: '专业词汇' }
+];
+var LIBRARY = [
+  { id: 'a1', cat: 'article', title: '春（节选）', source: '朱自清', lang: 'zh', text: '盼望着，盼望着，东风来了，春天的脚步近了。一切都像刚睡醒的样子，欣欣然张开了眼。山朗润起来了，水涨起来了，太阳的脸红起来了。' },
+  { id: 'a2', cat: 'article', title: '荷塘月色（节选）', source: '朱自清', lang: 'zh', text: '曲曲折折的荷塘上面，弥望的是田田的叶子。叶子出水很高，像亭亭的舞女的裙。层层的叶子中间，零星地点缀着些白花。' },
+  { id: 'a3', cat: 'article', title: '济南的冬天（节选）', source: '老舍', lang: 'zh', text: '对于一个在北平住惯的人，像我，冬天要是不刮风，便觉得是奇迹。济南的冬天是没有风声的，只有阳光与温暖。' },
+  { id: 'a4', cat: 'article', title: '背影（节选）', source: '朱自清', lang: 'zh', text: '我看见他戴着黑布小帽，穿着黑布大马褂，深青布棉袍，蹒跚地走到铁道边，慢慢探身下去。他用两手攀着上面，两脚再向上缩。' },
+  { id: 'c1', cat: 'code', title: 'Python · 斐波那契', source: 'python', lang: 'code', text: 'def fib(n):\n    a, b = 0, 1\n    for _ in range(n):\n        a, b = b, a + b\n    return a\n\nprint(fib(10))' },
+  { id: 'c2', cat: 'code', title: 'JavaScript · 数组求和', source: 'javascript', lang: 'code', text: 'const nums = [3, 1, 4, 1, 5];\nconst total = nums.reduce(function (sum, n) {\n  return sum + n;\n}, 0);\nconsole.log("total:", total);' },
+  { id: 'c3', cat: 'code', title: 'C · Hello World', source: 'c', lang: 'code', text: '#include <stdio.h>\n\nint main(void) {\n    printf("Hello, world!\\n");\n    return 0;\n}' },
+  { id: 'c4', cat: 'code', title: 'SQL · 分组查询', source: 'sql', lang: 'code', text: "SELECT name, COUNT(*) AS orders\nFROM customers\nJOIN orders ON orders.customer_id = customers.id\nWHERE orders.created_at >= '2026-01-01'\nGROUP BY name\nORDER BY orders DESC;" },
+  { id: 'd1', cat: 'doc', title: '会议通知', source: '仿写范本', lang: 'zh', text: '各部门：兹定于周五上午九点在三楼会议室召开年度工作会议。请各部门负责人准时参加，并提前准备汇报材料。' },
+  { id: 'd2', cat: 'doc', title: '会议纪要', source: '仿写范本', lang: 'zh', text: '会议听取了项目进展汇报，明确了下一阶段重点任务：一是完善需求文档，二是落实测试计划，三是加强跨部门沟通协作。' },
+  { id: 'd3', cat: 'doc', title: '工作简报', source: '仿写范本', lang: 'zh', text: '本周共完成工单四十七件，其中紧急事项六件，均已在时限内办结。下周将重点推进系统升级与人员培训工作。' },
+  { id: 'd4', cat: 'doc', title: '请示格式', source: '仿写范本', lang: 'zh', text: '因业务发展需要，拟申请采购办公设备一批，预算共计三万八千元整，妥否，请批示。' },
+  { id: 'p1', cat: 'poem', title: '静夜思', source: '李白', lang: 'zh', text: '床前明月光，疑是地上霜。举头望明月，低头思故乡。' },
+  { id: 'p2', cat: 'poem', title: '望庐山瀑布', source: '李白', lang: 'zh', text: '日照香炉生紫烟，遥看瀑布挂前川。飞流直下三千尺，疑是银河落九天。' },
+  { id: 'p3', cat: 'poem', title: '再别康桥（节选）', source: '徐志摩', lang: 'zh', text: '轻轻的我走了，正如我轻轻的来；我轻轻的招手，作别西天的云彩。那河畔的金柳，是夕阳中的新娘。' },
+  { id: 'p4', cat: 'poem', title: '水调歌头（节选）', source: '苏轼', lang: 'zh', text: '人有悲欢离合，月有阴晴圆缺，此事古难全。但愿人长久，千里共婵娟。' },
+  { id: 'r1', cat: 'pro', title: '计算机术语', source: '中英对照', lang: 'en', text: 'algorithm 算法 data structure 数据结构 compiler 编译器 operating system 操作系统 database 数据库 cache 缓存 concurrency 并发' },
+  { id: 'r2', cat: 'pro', title: '法律常用语', source: '中英对照', lang: 'zh', text: '本合同自双方签字之日起生效。甲方应按照约定履行义务，乙方有权就违约行为追究相应责任。' },
+  { id: 'r3', cat: 'pro', title: '财务词汇', source: '中英对照', lang: 'en', text: 'asset 资产 liability 负债 cash flow 现金流 profit margin 利润率 budget 预算 audit 审计 invoice 发票' },
+  { id: 'r4', cat: 'pro', title: '学术写作短语', source: '中英对照', lang: 'zh', text: '综上所述，本文通过实证研究验证了核心假设，研究结果表明该结论对实践具有指导意义，未来研究可进一步拓展样本范围。' }
+];
+function findLib(id) {
+  var found = null;
+  LIBRARY.forEach(function (it) { if (it.id === id) found = it; });
+  if (!found) {
+    state.customTexts.forEach(function (it) { if (it.id === id) found = it; });
+  }
+  return found;
+}
+
+/* ════════════ 9. 游戏词库 ════════════ */
+var GAME_WORDS = ('about above across action active actual advice again agree almost along already always amount answer appear around arrive artist assume attack august author autumn balance basket battle beach beauty become before begin behind believe belong below beside better between beyond bottom branch brave bread bridge bright bring brother budget build butter camera candle canvas captain carbon career carry castle catch cause center century certain chair chance change charge check cheese choice choose circle city claim class clean clear climb clock close cloth cloud coach coffee color column common company compare concert connect consider contact contain control cook corner correct cost cotton count course cousin cover craft create credit crowd crystal culture current custom damage dance danger dark data decide degree deliver demand depend depth design detail develop differ dinner direct discuss divide doctor double doubt draft dragon dream dress drink drive during earth easily east edge effect effort either electric employ energy engine enjoy enough enter event every exact example expect explain extra factor family famous farmer fashion father feature feeling field figure final finger finish fire first fish floor flower follow forget formal fortune forward frame fresh friend front fruit future garden gather general gentle gift glass global govern grade grain grand grass great green ground group growth guard guess guide happy health heart heavy history honest horse hotel human hundred hungry husband idea image imagine impact import improve include income increase indeed industry inform inside insist instead invest island issue jacket journey judge juice kitchen knowledge labor ladder language large later laugh laundry lawyer leader league leave legal length lesson letter level library light limit lion listen little local lonely long loud love lucky machine magic mail major manage manner market master match material matter maybe measure medical member memory mention message method middle might million mind minute mirror mistake modern moment money month morning mother mountain movie music narrow nation nature nearly necessary neighbor nervous network never night noise north notice number object ocean offer office often order other outside owner paint paper parent park party passage patient pattern peace people perfect perhaps period person picture piece place plan plant please pocket point police policy polite popular position possible power practice praise prepare present pretty prevent price pride print private prize problem process produce product program project proper protect prove provide public purpose quality quarter question quick quiet quite radio raise reach ready reason receive recent record reduce reflect region regular reject relate remain remember remove repeat report request require rescue reserve resist resource respect respond result return reveal review reward rhythm right river road rock role round route rule safety salary sample satisfy save scale scene schedule school science score search season second secret section secure select senior sense serious serve service settle several shadow shake share sharp sheet shell shift shine ship shirt shock shoot short should shoulder shout show side signal silent similar simple since single sister skill sleep slide small smart smile smoke social society soft solid solve someone sorry sound source south space speak special speed spend spirit sport spread square stage stand standard start state station stay steady stick still stone store storm story straight strange street stretch strong student study stuff style subject succeed sudden suffer suggest summer supply support suppose surface surprise survive sweet symbol system table talent target taste teach teacher technology telephone temperature ten tend term terrible test thank theory thick thing think third though thought thousand threat three through throw ticket tiger tight title today together tomorrow tonight total touch toward tower trade traffic train travel treat tree trend trial trip trouble trust truth twice type uncle under understand union unique unit until unusual update urban useful usual valley value various vector version victim view village virtue vision visit voice volume vote wages wait walk wall warm wash watch water wealth weather wedding week weight welcome west wheel whether which while white whole wide wife wild wind window winter wisdom wish woman wonder wooden worry worth write wrong yard year yellow yesterday young zone').split(' ');
+var GAME_WORDS_ZH = ['练习', '键盘', '速度', '准确', '节奏', '盲打', '专注', '进阶', '坚持', '熟练'];
+
+/* ════════════ 10. 打字引擎 ════════════ */
+function TypingEngine(cfg) {
+  this.textEl = cfg.textEl;
+  this.stageEl = cfg.stageEl;
+  this.inputEl = cfg.inputEl;
+  this.liveEl = cfg.liveEl || null;
+  this.progressEl = cfg.progressEl || null;
+  this.liveFeedback = cfg.liveFeedback !== false;
+  this.onFinish = cfg.onFinish || function () {};
+  this.onStart = cfg.onStart || function () {};
+  this.lang = 'en';
+
+  this.text = '';
+  this.chars = [];
+  this.nodes = [];
+  this.typed = '';
+  this.started = false;
+  this.done = false;
+  this.startTs = 0;
+  this.endTs = 0;
+  this.keystrokes = 0;
+  this.errKeystrokes = 0;
+  this.errPairs = [];
+  this.keyStats = {};
+  this.timerId = null;
+  this.composing = false;
+  this.hideKbd = false;
+  this.blind = false;
+  this.feedbackless = false;
+  this.timeLimitSec = 0;
+  this.bind();
+}
+TypingEngine.prototype.bind = function () {
+  var self = this;
+  on(this.inputEl, 'compositionstart', function () { self.composing = true; });
+  on(this.inputEl, 'compositionend', function () {
+    self.composing = false;
+    self.ingest(self.inputEl.value);
+    self.syncInput();
+  });
+  on(this.inputEl, 'input', function (e) {
+    if (self.composing || (e && e.isComposing)) return;
+    self.ingest(self.inputEl.value);
+    self.syncInput();
+  });
+  on(this.inputEl, 'keydown', function (e) {
+    if (e.key === 'Enter' && !self.composing && !e.isComposing) {
+      e.preventDefault();
+      self.ingest(self.inputEl.value + '\n');
+      self.syncInput();
+      return;
+    }
+    if (self.liveFeedback && !e.ctrlKey && !e.metaKey && !e.altKey && e.key && e.key.length === 1) {
+      flashKey(e.key);
+    }
+    if (e.key === 'Escape') { self.inputEl.blur(); }
+  });
+  on(this.textEl.parentNode, 'click', function () {
+    if (!self.done) self.focus();
+  });
+};
+TypingEngine.prototype.load = function (text, lang) {
+  this.text = text;
+  this.lang = lang || 'en';
+  this.typed = '';
+  this.started = false;
+  this.done = false;
+  this.startTs = 0;
+  this.endTs = 0;
+  this.keystrokes = 0;
+  this.errKeystrokes = 0;
+  this.errPairs = [];
+  this.keyStats = {};
+  this.composing = false;
+  if (this.timerId) { window.clearInterval(this.timerId); this.timerId = null; }
+  this.build();
+  this.inputEl.value = '';
+  if (this.liveEl) this.liveEl.textContent = '输入即开始计时';
+  if (this.progressEl) this.progressEl.textContent = '0 / ' + this.chars.length;
+  this.focus();
+};
+TypingEngine.prototype.build = function () {
+  var frag = document.createDocumentFragment();
+  this.nodes = [];
+  this.chars = Array.from(this.text);
+  for (var i = 0; i < this.chars.length; i++) {
+    var s = document.createElement('span');
+    s.className = 'ch';
+    s.textContent = this.chars[i];
+    frag.appendChild(s);
+    this.nodes.push(s);
+  }
+  this.textEl.innerHTML = '';
+  this.textEl.appendChild(frag);
+  this.textEl.style.transform = 'translateY(0px)';
+  this.paintAll();
+};
+TypingEngine.prototype.clsFor = function (i) {
+  var c = 'ch';
+  if (i < this.typed.length) {
+    c += (this.feedbackless || this.typed.charAt(i) === this.chars[i]) ? ' ok' : ' err';
+  }
+  if (i === this.typed.length && !this.done) c += ' cur';
+  if (this.chars[i] === '\n') c += ' br';
+  return c;
+};
+TypingEngine.prototype.paintAll = function () {
+  for (var i = 0; i < this.nodes.length; i++) this.nodes[i].className = this.clsFor(i);
+  this.follow();
+};
+TypingEngine.prototype.paintFrom = function (from) {
+  if (from < 0) from = 0;
+  for (var i = from; i < this.nodes.length; i++) this.nodes[i].className = this.clsFor(i);
+  this.follow();
+};
+TypingEngine.prototype.follow = function () {
+  var n = this.nodes[this.typed.length];
+  if (!n) return;
+  var cs = window.getComputedStyle(this.textEl);
+  var lh = parseFloat(cs.lineHeight);
+  if (!lh || isNaN(lh)) lh = (parseFloat(cs.fontSize) || 26) * 1.7;
+  var top = n.offsetTop;
+  var target = Math.max(0, top - lh);
+  this.textEl.style.transform = 'translateY(' + (-target) + 'px)';
+};
+TypingEngine.prototype.syncInput = function () {
+  if (this.composing) return;
+  if (this.inputEl.value !== this.typed) {
+    try { this.inputEl.value = this.typed; } catch (err) { /* 忽略 */ }
+  }
+};
+TypingEngine.prototype.normKey = function (ch) {
+  return CHAR_TO_KEY[ch] || ch;
+};
+TypingEngine.prototype.addKeyStat = function (targetCh, ok) {
+  var k = this.normKey(targetCh);
+  var rec = this.keyStats[k] || { total: 0, err: 0 };
+  rec.total++;
+  if (!ok) rec.err++;
+  this.keyStats[k] = rec;
+};
+TypingEngine.prototype.ingest = function (v) {
+  if (this.done) return;
+  v = String(v == null ? '' : v);
+  if (this.chars.length && v.length > this.chars.length) v = v.slice(0, this.chars.length);
+  var old = this.typed;
+  var p = 0;
+  var maxP = Math.min(old.length, v.length);
+  while (p < maxP && old.charAt(p) === v.charAt(p)) p++;
+  var os = old.length;
+  var vs = v.length;
+  while (os > p && vs > p && old.charAt(os - 1) === v.charAt(vs - 1)) { os--; vs--; }
+  for (var k = p; k < vs; k++) {
+    var ch = v.charAt(k);
+    var target = this.chars[k];
+    var okChar = ch === target;
+    this.keystrokes++;
+    if (!okChar) {
+      this.errKeystrokes++;
+      if (target != null) this.errPairs.push({ idx: k, want: target, got: ch });
+      this.addKeyStat(target, false);
+      if (this.liveFeedback) blip('err');
+    } else {
+      this.addKeyStat(target, true);
+      if (this.liveFeedback) blip(ch === ' ' ? 'hit' : 'key');
+    }
+    if (this.liveFeedback) flashKey(ch);
+  }
+  var next = old.slice(0, p) + v.slice(p, vs) + old.slice(os);
+  if (this.liveFeedback && state.settings.strict) {
+    for (var i2 = 0; i2 < next.length; i2++) {
+      if (next.charAt(i2) !== this.chars[i2]) { next = next.slice(0, i2 + 1); break; }
+    }
+  }
+  this.typed = next;
+  if (!this.started && this.keystrokes > 0) {
+    this.started = true;
+    this.startTs = Date.now();
+    var self = this;
+    this.timerId = window.setInterval(function () { self.tick(); }, 200);
+    this.onStart();
+  }
+  this.paintFrom(Math.min(p, next.length));
+  this.updateMeta();
+  if (this.typed.length === this.chars.length && this.chars.length > 0) this.finish();
+};
+TypingEngine.prototype.updateMeta = function () {
+  if (this.progressEl) this.progressEl.textContent = this.typed.length + ' / ' + this.chars.length;
+  if (!this.liveEl || !this.started || this.done) return;
+  var st = this.stats();
+  var speed = this.lang === 'zh' ? st.cpm : st.wpm;
+  var txt = fmtNum(speed) + (this.lang === 'zh' ? ' 字/分' : ' WPM') + ' · 正确率 ' + fmtNum(st.acc) + '%';
+  if (this.timeLimitSec) txt = '剩余 ' + fmtClock(this.timeLimitSec - st.sec) + ' · ' + txt;
+  this.liveEl.textContent = txt;
+};
+TypingEngine.prototype.tick = function () {
+  if (!this.done && this.started && this.timeLimitSec && Date.now() - this.startTs >= this.timeLimitSec * 1000) {
+    this.finish();
+    return;
+  }
+  this.updateMeta();
+};
+TypingEngine.prototype.stats = function () {
+  var now = this.done ? this.endTs : Date.now();
+  var elapsed = Math.max(now - this.startTs, 1000);
+  var min = elapsed / 60000;
+  var correct = 0;
+  var wrong = 0;
+  for (var i = 0; i < this.typed.length; i++) {
+    if (this.typed.charAt(i) === this.chars[i]) correct++;
+    else wrong++;
+  }
+  var acc = this.keystrokes ? (this.keystrokes - this.errKeystrokes) / this.keystrokes * 100 : 100;
+  return {
+    elapsedMs: elapsed,
+    sec: elapsed / 1000,
+    correct: correct,
+    wrong: wrong,
+    typedLen: this.typed.length,
+    total: this.chars.length,
+    acc: acc,
+    wpm: (correct / 5) / min,
+    cpm: correct / min,
+    rawWpm: (this.keystrokes / 5) / min,
+    keystrokes: this.keystrokes,
+    errKeystrokes: this.errKeystrokes
+  };
+};
+TypingEngine.prototype.finish = function () {
+  if (this.done) return;
+  this.done = true;
+  this.endTs = Date.now();
+  if (this.timerId) { window.clearInterval(this.timerId); this.timerId = null; }
+  this.paintAll();
+  this.onFinish(this.stats(), this);
+};
+TypingEngine.prototype.reset = function () {
+  this.load(this.text, this.lang);
+};
+TypingEngine.prototype.focus = function () {
+  try { this.inputEl.focus({ preventScroll: true }); } catch (err) { this.inputEl.focus(); }
+};
+
+/* ════════════ 11. 视图与练习控制器 ════════════ */
+var VIEWS = ['practice', 'lessons', 'training', 'library', 'game', 'exam', 'stats'];
+var currentView = 'practice';
+function switchView(name) {
+  if (VIEWS.indexOf(name) === -1) return;
+  currentView = name;
+  $$('.nav-item').forEach(function (b) { b.classList.toggle('active', b.getAttribute('data-view') === name); });
+  $$('.view').forEach(function (v) { v.classList.toggle('active', v.getAttribute('data-view') === name); });
+  if (name === 'lessons') renderLessons();
+  if (name === 'training') renderTraining();
+  if (name === 'library') renderLibrary();
+  if (name === 'stats') renderStats();
+  if (name === 'game') gameEnter();
+  else gameLeave();
+  if (name === 'practice' && practice.engine && !practice.engine.done) practice.engine.focus();
+}
+function overlayShow(html) { var ov = $('#stageOverlay'); ov.innerHTML = html; ov.hidden = false; }
+function overlayHide() { $('#stageOverlay').hidden = true; }
+
+var practice = { engine: null, current: null };
+var currentEngine = null;
+
+function srcForValue(val) {
+  if (!val) return null;
+  if (val.indexOf('lesson:') === 0) {
+    var ls = findLesson(val.slice(7));
+    if (!ls) return null;
+    return { id: ls.id, lessonId: ls.id, text: ls.text, lang: ls.lang, mode: 'lesson', label: '课程 · ' + ls.name, selectValue: val };
+  }
+  if (val.indexOf('lib:') === 0) {
+    var it = findLib(val.slice(4));
+    if (!it) return null;
+    return { id: it.id, text: it.text, lang: it.lang, mode: 'library', label: '素材 · ' + it.title, selectValue: val, custom: !!it.custom };
+  }
+  if (val.indexOf('custom:') === 0) {
+    var ct = findLib(val.slice(7));
+    if (!ct) return null;
+    return { id: ct.id, text: ct.text, lang: ct.lang, mode: 'custom', label: '自定义 · ' + ct.title, selectValue: val };
+  }
+  return null;
+}
+function loadPractice(src) {
+  if (!src || !src.text) return;
+  practice.current = src;
+  practice.engine.feedbackless = false;
+  practice.engine.liveFeedback = true;
+  practice.engine.hideKbd = !!src.hideKbd;
+  practice.engine.blind = !!src.blindText;
+  practice.engine.timeLimitSec = src.durationSec || 0;
+  $('#practiceText').classList.toggle('blind', !!src.blindText);
+  $('#metaSource').textContent = src.label || '';
+  $('#resultPanel').hidden = true;
+  practice.engine.load(src.text, src.lang || 'en');
+  syncPrefUI();
+  if (src.blindText) overlayShow(overlayBlind()); else overlayHide();
+  practice.engine.focus();
+}
+function restartPractice() {
+  if (practice.current) loadPractice(practice.current);
+}
+function overlayBlind() {
+  return '<div class="overlay-card"><div class="result-title">盲打模式</div>' +
+    '<p class="small muted">文本与键盘已隐藏，凭记忆与节奏输入。<br>按任意键或点击下方按钮开始。</p>' +
+    '<button class="btn btn-primary" type="button" data-act="start"><svg aria-hidden="true"><use href="#i-play"/></svg>开始</button></div>';
+}
+function overlayDone() {
+  var st = practice.engine.stats();
+  var e = practice.engine;
+  var spd = e.lang === 'zh' ? fmtNum(st.cpm) + ' 字/分' : fmtNum(st.wpm) + ' WPM';
+  return '<div class="overlay-card"><div class="result-title">完成</div>' +
+    '<p class="small muted">' + spd + ' · 正确率 ' + fmtNum(st.acc) + '% · 用时 ' + fmtDur(st.sec) + '</p>' +
+    '<div class="row"><button class="btn btn-primary" type="button" data-act="again"><svg aria-hidden="true"><use href="#i-reset"/></svg>再来一遍</button>' +
+    '<button class="btn btn-ghost" type="button" data-act="hide">查看文本</button></div></div>';
+}
+function classifyErr(want, got) {
+  if (want == null || got == null) return 'other';
+  if (got === '\n' || want === '\n') return 'other';
+  if (want.toLowerCase() === got.toLowerCase()) return 'case';
+  var wb = CHAR_TO_KEY[want];
+  var gb = CHAR_TO_KEY[got];
+  if (wb && gb && wb === gb) return 'case';
+  if (wb && gb && areAdjacent(wb, gb)) return 'adjacent';
+  if (isPunct(want) && isPunct(got)) return 'punct';
+  return 'other';
+}
+function isPunct(ch) {
+  return !!ch && /[^\w\s\u4e00-\u9fa5]/.test(ch);
+}
+function summarizeErrors(pairs) {
+  var out = { adjacent: 0, case: 0, punct: 0, other: 0 };
+  pairs.forEach(function (p) { out[classifyErr(p.want, p.got)]++; });
+  return out;
+}
+function mergeKeyStats(session) {
+  Object.keys(session).forEach(function (k) {
+    var g = state.keyStats[k] || { total: 0, err: 0 };
+    g.total += session[k].total;
+    g.err += session[k].err;
+    state.keyStats[k] = g;
+  });
+}
+function onPracticeFinish(st, eng) {
+  var src = practice.current || {};
+  $('#practiceText').classList.remove('blind');
+  var entry = {
+    ts: Date.now(),
+    mode: src.mode || 'practice',
+    label: src.label || '练习',
+    lessonId: src.lessonId || null,
+    lang: eng.lang,
+    wpm: Math.round(st.wpm * 10) / 10,
+    cpm: Math.round(st.cpm * 10) / 10,
+    acc: Math.round(st.acc * 10) / 10,
+    sec: Math.round(st.sec),
+    chars: eng.chars.length,
+    typed: st.typedLen,
+    keystrokes: st.keystrokes,
+    errs: st.errKeystrokes,
+    errSummary: summarizeErrors(eng.errPairs)
+  };
+  state.history.unshift(entry);
+  if (state.history.length > 200) state.history.length = 200;
+  mergeKeyStats(eng.keyStats);
+  state.totals.sec += entry.sec;
+  state.totals.sessions += 1;
+  state.totals.chars += entry.typed;
+  var best = null;
+  if (src.lessonId) {
+    var stars = starsFor(entry, eng.lang);
+    var prev = state.lessonBest[src.lessonId];
+    if (!prev || stars > prev.stars || (stars === prev.stars && entry.wpm > prev.wpm)) {
+      best = { stars: stars, wpm: entry.wpm, acc: entry.acc, ts: entry.ts, speed: eng.lang === 'zh' ? entry.cpm : entry.wpm };
+      state.lessonBest[src.lessonId] = best;
+    }
+  }
+  saveState();
+  paintKeyHeat(state.keyStats);
+  renderResult(entry, eng);
+  overlayShow(overlayDone());
+  updateSideTotals();
+}
+function starsFor(entry, lang) {
+  var s = 1;
+  if (entry.acc >= 90) s++;
+  if (entry.acc >= 96) s++;
+  if (entry.acc >= 99) s++;
+  var speedOk = lang === 'zh' ? entry.cpm >= 80 : entry.wpm >= 40;
+  if (speedOk && entry.acc >= 96) s = 5;
+  return Math.min(s, 5);
+}
+function renderResult(entry, eng) {
+  var panel = $('#resultPanel');
+  panel.hidden = false;
+  var speedV = eng.lang === 'zh' ? entry.cpm + ' 字/分' : entry.wpm + ' WPM';
+  $('#resPill').textContent = entry.acc >= 97 ? '表现出色' : entry.acc >= 92 ? '稳定完成' : '继续打磨';
+  $('#resTime').textContent = fmtWhen(entry.ts) + ' · ' + fmtDur(entry.sec);
+  $('#resultGrid').innerHTML =
+    '<div class="res-cell"><span class="rc-k">净速度</span><span class="rc-v">' + speedV + '</span></div>' +
+    '<div class="res-cell"><span class="rc-k">正确率</span><span class="rc-v">' + entry.acc + '<small> %</small></span><span class="small muted">按击键统计</span></div>' +
+    '<div class="res-cell"><span class="rc-k">用时</span><span class="rc-v">' + fmtClock(entry.sec) + '</span></div>' +
+    '<div class="res-cell"><span class="rc-k">击键 / 错误</span><span class="rc-v">' + entry.keystrokes + '<small> / ' + entry.errs + '</small></span></div>';
+  var list = $('#resErrList');
+  var pairs = eng.errPairs.slice(0, 12);
+  if (!pairs.length) {
+    list.innerHTML = '<div class="err-item" style="background: var(--color-accent-soft)"><span class="pos">—</span><span class="want">本段没有出现错误，保持这个状态。</span></div>';
+  } else {
+    list.innerHTML = pairs.map(function (p) {
+      var w = p.want === '\n' ? '回车' : p.want;
+      var g = p.got === '\n' ? '回车' : p.got;
+      return '<div class="err-item"><span class="pos">#' + (p.idx + 1) + '</span><span class="want">期望「' + esc(w) + '」</span><span class="got">输入「' + esc(g) + '」</span></div>';
+    }).join('');
+  }
+  var weak = topWeakKeys(5, eng.keyStats);
+  $('#resWeakRow').innerHTML = weak.length
+    ? '<span class="small muted">本次弱键：</span>' + weak.map(function (w) {
+        return '<span class="weak-key">' + esc(w.key) + ' · ' + w.err + ' 次</span>';
+      }).join('')
+    : '';
+}
+function topWeakKeys(n, source) {
+  var stats = source || state.keyStats;
+  var list = [];
+  Object.keys(stats).forEach(function (k) {
+    var rec = stats[k];
+    if (k.length !== 1 || rec.total < 3 || rec.err <= 0) return;
+    list.push({ key: k, total: rec.total, err: rec.err, rate: rec.err / rec.total });
+  });
+  list.sort(function (a, b) { return b.err - a.err || b.rate - a.rate; });
+  return list.slice(0, n || 10);
+}
+function updateSideTotals() {
+  var el = $('#sideTotals');
+  if (el) el.textContent = state.totals.sessions + ' 次练习 · ' + fmtNum(state.totals.sec / 60) + ' 分钟';
+}
+
+/* ════════════ 12. 课程视图 ════════════ */
+function renderLessons() {
+  var wrap = $('#levelBlocks');
+  var html = '';
+  COURSES.forEach(function (lv) {
+    var done = 0;
+    lv.lessons.forEach(function (ls) { if (state.lessonBest[ls.id]) done++; });
+    var pct = Math.round(done / lv.lessons.length * 100);
+    html += '<div class="level-block" data-component="level-block">';
+    html += '<div class="level-head"><span class="level-no">' + esc(lv.no) + '</span><h3 class="level-name">' + esc(lv.name) + '</h3>' +
+      '<div class="level-bar"><div class="progress"><i style="width: ' + pct + '%"></i></div></div>' +
+      '<span class="small muted num">' + done + ' / ' + lv.lessons.length + ' 课完成</span></div>';
+    html += '<div class="lesson-list" data-component="lesson-list">';
+    lv.lessons.forEach(function (ls) { html += lessonRowHTML(ls); });
+    html += '</div></div>';
+  });
+  wrap.innerHTML = html;
+}
+function lessonRowHTML(ls) {
+  var best = state.lessonBest[ls.id];
+  var stars = best ? best.stars : 0;
+  var starHTML = '';
+  for (var i = 0; i < 5; i++) starHTML += i < stars ? '★' : '<span class="off">★</span>';
+  var bestTxt = best
+    ? fmtNum(best.speed) + (ls.lang === 'zh' ? ' 字/分 · ' : ' WPM · ') + fmtNum(best.acc) + '%'
+    : '尚未练习';
+  return '<div class="lesson-row" data-component="lesson-row">' +
+    '<div><div class="lesson-name">' + esc(ls.name) + '</div><div class="lesson-meta">' + ls.text.length + ' 字 · ' + (ls.lang === 'zh' ? '中文拼音' : '英文直打') + '</div></div>' +
+    '<div style="text-align: right"><div class="lesson-stars">' + starHTML + '</div><div class="lesson-best">' + bestTxt + '</div></div>' +
+    '<div class="lesson-actions"><button class="btn btn-secondary btn-sm" type="button" data-lesson="' + ls.id + '"><svg aria-hidden="true"><use href="#i-play"/></svg>练习</button></div>' +
+    '</div>';
+}
+
+/* ════════════ 13. 专项训练 ════════════ */
+function keyInfo(k) {
+  for (var r = 0; r < KBD_ROWS.length; r++) {
+    for (var c = 0; c < KBD_ROWS[r].length; c++) {
+      if (KBD_ROWS[r][c][0] === k) return { r: r, c: c };
+    }
+  }
+  return null;
+}
+function areAdjacent(a, b) {
+  var ka = keyInfo(a);
+  var kb = keyInfo(b);
+  if (!ka || !kb) return false;
+  var dr = Math.abs(ka.r - kb.r);
+  var dc = Math.abs(ka.c - kb.c);
+  if (dr === 0 && dc === 1) return true;
+  if (dr === 1 && dc <= 1) return true;
+  return false;
+}
+function neighborsOf(k) {
+  var pos = keyInfo(k);
+  if (!pos) return [];
+  var out = [];
+  function addAt(r, c) {
+    var row = KBD_ROWS[r];
+    if (!row) return;
+    var cell = row[c];
+    if (!cell) return;
+    var ch = cell[0];
+    if (ch.length === 1 && ch !== k) out.push(ch);
+  }
+  addAt(pos.r, pos.c - 1);
+  addAt(pos.r, pos.c + 1);
+  addAt(pos.r - 1, pos.c);
+  addAt(pos.r + 1, pos.c);
+  return out;
+}
+function buildWeakDrill() {
+  var weak = topWeakKeys(6);
+  if (!weak.length) return null;
+  var blocks = [];
+  weak.forEach(function (w) {
+    var k = w.key;
+    blocks.push(k + k + k);
+    var nb = neighborsOf(k);
+    if (nb[0]) blocks.push(nb[0] + k + nb[0] + k);
+    if (nb[1]) blocks.push(k + nb[1] + k + k + nb[1]);
+  });
+  var pieces = [];
+  var total = 0;
+  var guard = 0;
+  while (total < 170 && guard < 500) {
+    guard++;
+    var blk = pick(blocks);
+    pieces.push(blk);
+    total += blk.length + 1;
+  }
+  return pieces.join(' ');
+}
+function renderTraining() {
+  var weak = topWeakKeys(6);
+  var grid = $('#weakGrid');
+  if (weak.length) {
+    grid.innerHTML = weak.map(function (w) {
+      return '<div class="weak-cell"><span class="wk">' + esc(w.key) + '</span><span class="wc">' + w.err + ' 次错</span></div>';
+    }).join('');
+  } else {
+    grid.innerHTML = '<p class="small muted">还没有足够的错误记录，先完成几组练习或一次考试。</p>';
+  }
+  var board = $('#weakBoard');
+  var top = topWeakKeys(10);
+  if (!top.length) {
+    board.innerHTML = '<p class="small muted">暂无数据。完成练习后，弱键排行会在这里自动生成。</p>';
+  } else {
+    var maxErr = top[0].err || 1;
+    board.innerHTML = top.map(function (w) {
+      var pct = Math.round(w.err / maxErr * 100);
+      return '<div class="typebar tb-adjacent"><div class="tb-head"><span class="num">' + esc(w.key) + '</span><span class="num">' + w.err + ' 次错误 · ' + fmtNum(w.rate * 100, 1) + '%</span></div>' +
+        '<div class="tb-track"><div class="tb-fill" style="width: ' + pct + '%"></div></div></div>';
+    }).join('');
+  }
+}
+
+/* ════════════ 14. 素材库视图 ════════════ */
+var libCat = 'article';
+function renderLibrary() {
+  renderLibGrid();
+  renderCustomList();
+}
+function renderLibGrid() {
+  var grid = $('#libGrid');
+  var items = LIBRARY.filter(function (it) { return it.cat === libCat; });
+  grid.innerHTML = items.map(function (it) {
+    var preview = it.text.replace(/\n/g, ' / ').slice(0, 56);
+    return '<article class="lib-card" data-component="lib-card">' +
+      '<div class="lib-title">' + esc(it.title) + '</div>' +
+      '<div class="lib-preview">' + esc(preview) + '</div>' +
+      '<div class="lib-meta">' + esc(it.source) + ' · ' + it.text.length + ' 字</div>' +
+      '<div class="lib-actions"><button class="btn btn-secondary btn-sm" type="button" data-lib="' + it.id + '">练这段</button>' +
+      '<button class="btn btn-ghost btn-sm" type="button" data-lib-rand="' + it.cat + '">随机一篇</button></div>' +
+      '</article>';
+  }).join('');
+}
+function renderCustomList() {
+  var list = $('#customList');
+  $('#customCount').textContent = state.customTexts.length + ' 条';
+  if (!state.customTexts.length) {
+    list.innerHTML = '<div class="empty-state"><svg aria-hidden="true"><use href="#i-info"/></svg><p class="small">还没有自定义素材。在上方粘贴文本并保存，就能在练习中调用。</p></div>';
+    return;
+  }
+  list.innerHTML = state.customTexts.map(function (it) {
+    return '<div class="custom-item" data-component="custom-item"><div>' +
+      '<div class="lesson-name">' + esc(it.title) + '</div>' +
+      '<div class="lesson-meta">' + it.text.length + ' 字 · ' + fmtWhen(it.ts) + '</div></div>' +
+      '<div class="row"><button class="btn btn-secondary btn-sm" type="button" data-custom-play="' + it.id + '">练习</button>' +
+      '<button class="btn btn-ghost btn-sm" type="button" data-custom-del="' + it.id + '">删除</button></div></div>';
+  }).join('');
+}
+function saveCustomText() {
+  var text = $('#importText').value.trim();
+  var title = $('#importTitle').value.trim();
+  if (text.length < 20) { toast('文本太短了，至少 20 个字符', 'warn'); return; }
+  if (text.length > 5000) { toast('文本过长，请控制在 5000 字符以内', 'warn'); return; }
+  var chunks = [];
+  if (text.length <= 600) {
+    chunks.push(text);
+  } else {
+    var parts = text.split(/\n{2,}/);
+    var buf = '';
+    parts.forEach(function (p) {
+      if (buf && (buf.length + p.length + 2) > 480) { chunks.push(buf); buf = ''; }
+      buf = buf ? buf + '\n\n' + p : p;
+    });
+    if (buf) chunks.push(buf);
+  }
+  var base = title || '自定义素材';
+  chunks.forEach(function (chunk, i) {
+    state.customTexts.unshift({
+      id: 'c-' + Date.now() + '-' + (1000 + i),
+      title: chunks.length > 1 ? base + ' · 第 ' + (i + 1) + ' 段' : base,
+      text: chunk.trim(),
+      lang: /[\u4e00-\u9fa5]/.test(chunk) ? 'zh' : 'en',
+      ts: Date.now()
+    });
+  });
+  saveState();
+  buildLessonSelect();
+  renderCustomList();
+  $('#importText').value = '';
+  $('#importTitle').value = '';
+  toast('已保存 ' + chunks.length + ' 条素材');
+}
+function buildLessonSelect() {
+  var sel = $('#lessonSelect');
+  var prev = sel.value;
+  var html = '';
+  COURSES.forEach(function (lv) {
+    html += '<optgroup label="' + esc(lv.no) + ' · ' + esc(lv.name) + '">';
+    lv.lessons.forEach(function (ls) {
+      html += '<option value="lesson:' + ls.id + '">' + esc(ls.name) + '</option>';
+    });
+    html += '</optgroup>';
+  });
+  html += '<optgroup label="素材库">';
+  LIBRARY.forEach(function (it) {
+    html += '<option value="lib:' + it.id + '">' + esc(it.title) + '</option>';
+  });
+  html += '</optgroup>';
+  if (state.customTexts.length) {
+    html += '<optgroup label="自定义素材">';
+    state.customTexts.forEach(function (it) {
+      html += '<option value="custom:' + it.id + '">' + esc(it.title) + '</option>';
+    });
+    html += '</optgroup>';
+  }
+  sel.innerHTML = html;
+  if (prev && sel.querySelector('option[value="' + prev + '"]')) sel.value = prev;
+}
+function selectedLessonSrc() {
+  var v = $('#lessonSelect').value;
+  var src = srcForValue(v);
+  if (src) return src;
+  return srcForValue('lesson:' + COURSES[0].lessons[0].id);
+}
+
+/* ════════════ 15. 单词雨游戏 ════════════ */
+var game = {
+  running: false, paused: false,
+  score: 0, combo: 0, bestCombo: 0, kills: 0, lives: 3,
+  buffer: '', target: null, words: [],
+  raf: null, lastTs: 0, spawnTimer: 0,
+  difficulty: 'normal', accepted: 0, rejected: 0, startTs: 0,
+  DIFF: {
+    easy: { speed: 24, spawn: 2400, max: 5 },
+    normal: { speed: 38, spawn: 1650, max: 6 },
+    hard: { speed: 56, spawn: 1150, max: 7 }
+  }
+};
+function setGameOverlay(kind, info) {
+  var ov = $('#gameOverlay');
+  var html = '';
+  if (kind === 'idle') {
+    html = '<div class="overlay-card"><div class="result-title">单词雨</div>' +
+      '<p class="small muted" style="text-align: center">输入落下的单词（不区分大小写，建议使用英文输入状态）。<br>漏掉三个单词游戏结束，完整键入即击落。</p>' +
+      '<button class="btn btn-primary" type="button" data-act="start"><svg aria-hidden="true"><use href="#i-play"/></svg>开始游戏</button>' +
+      '<span class="small muted">按 <span class="kbd">Esc</span> 随时暂停</span></div>';
+  } else if (kind === 'pause') {
+    html = '<div class="overlay-card"><div class="result-title">已暂停</div>' +
+      '<p class="small muted">按 Esc 或点击下方按钮继续。</p>' +
+      '<div class="row"><button class="btn btn-primary" type="button" data-act="resume"><svg aria-hidden="true"><use href="#i-play"/></svg>继续</button>' +
+      '<button class="btn btn-secondary" type="button" data-act="stop">结束本局</button></div></div>';
+  } else {
+    html = '<div class="overlay-card"><div class="result-title">游戏结束</div>' +
+      '<p class="small muted">得分 <span class="num">' + info.score + '</span> · 击落 <span class="num">' + info.kills + '</span> 词 · 最高连击 <span class="num">' + info.combo + '</span></p>' +
+      '<button class="btn btn-primary" type="button" data-act="start"><svg aria-hidden="true"><use href="#i-play"/></svg>再来一局</button></div>';
+  }
+  ov.innerHTML = html;
+  ov.hidden = false;
+}
+function startGame() {
+  game.running = true;
+  game.paused = false;
+  game.score = 0; game.combo = 0; game.bestCombo = 0; game.kills = 0; game.lives = 3;
+  game.buffer = ''; game.target = null; game.words = [];
+  game.spawnTimer = 1e9; game.lastTs = 0;
+  game.accepted = 0; game.rejected = 0; game.startTs = Date.now();
+  $$('.gword').forEach(function (el) { if (el.parentNode) el.parentNode.removeChild(el); });
+  $('#gameOverlay').hidden = true;
+  updateGameHUD();
+  renderGameBuffer();
+  if (game.raf) window.cancelAnimationFrame(game.raf);
+  game.raf = window.requestAnimationFrame(gameStep);
+}
+function spawnWord(diff) {
+  var maxLen = game.difficulty === 'easy' ? 4 : game.difficulty === 'normal' ? 6 : 99;
+  var minLen = game.difficulty === 'easy' ? 3 : game.difficulty === 'normal' ? 4 : 5;
+  var pool = GAME_WORDS.filter(function (w) { return w.length >= minLen && w.length <= maxLen; });
+  if (!pool.length) pool = GAME_WORDS;
+  var word = pick(pool);
+  var arena = $('#gameArena');
+  var el = document.createElement('div');
+  el.className = 'gword';
+  el.textContent = word;
+  el.style.top = '0';
+  el.style.left = '0';
+  arena.appendChild(el);
+  var W = arena.clientWidth;
+  var x = 12 + rand(Math.max(10, W - el.offsetWidth - 24));
+  var wObj = { word: word, el: el, x: x, y: -40, speed: diff.speed + rand(14) };
+  el.style.transform = 'translate(' + x + 'px, ' + wObj.y + 'px)';
+  game.words.push(wObj);
+}
+function gameStep(ts) {
+  if (!game.running || game.paused) { game.raf = null; return; }
+  if (!game.lastTs) game.lastTs = ts;
+  var dt = Math.min((ts - game.lastTs) / 1000, 0.06);
+  game.lastTs = ts;
+  var diff = game.DIFF[game.difficulty];
+  var arena = $('#gameArena');
+  var missY = arena.clientHeight - 86;
+  game.spawnTimer += dt * 1000;
+  if (game.spawnTimer >= diff.spawn && game.words.length < diff.max) {
+    game.spawnTimer = 0;
+    spawnWord(diff);
+  }
+  for (var i = game.words.length - 1; i >= 0; i--) {
+    var w = game.words[i];
+    w.y += w.speed * dt;
+    w.el.style.transform = 'translate(' + w.x + 'px, ' + w.y + 'px)';
+    if (w.y > missY) missWord(w);
+  }
+  game.raf = window.requestAnimationFrame(gameStep);
+}
+function missWord(w) {
+  var i = game.words.indexOf(w);
+  if (i !== -1) game.words.splice(i, 1);
+  if (w.el && w.el.parentNode) w.el.parentNode.removeChild(w.el);
+  if (game.target === w) { game.target = null; game.buffer = ''; renderGameBuffer(); }
+  game.lives--;
+  game.combo = 0;
+  blip('err');
+  updateGameHUD();
+  if (game.lives <= 0) gameOver();
+}
+function gameType(ch) {
+  if (!game.running || game.paused) return;
+  ch = ch.toLowerCase();
+  if (!game.buffer) {
+    var cands = game.words.filter(function (w) { return w.word.charAt(0) === ch; });
+    if (!cands.length) { game.rejected++; blip('err'); return; }
+    cands.sort(function (a, b) { return b.y - a.y; });
+    game.target = cands[0];
+    game.buffer = ch;
+  } else if (game.target && game.words.indexOf(game.target) !== -1) {
+    var nextStr = game.buffer + ch;
+    if (game.target.word.indexOf(nextStr) === 0) { game.buffer = nextStr; }
+    else { game.rejected++; blip('err'); return; }
+  } else {
+    game.target = null;
+    game.buffer = '';
+    gameType(ch);
+    return;
+  }
+  game.accepted++;
+  if (game.target && game.buffer === game.target.word) killWord(game.target);
+  renderGameBuffer();
+}
+function gameBackspace() {
+  if (!game.buffer) return;
+  game.buffer = game.buffer.slice(0, -1);
+  if (!game.buffer) game.target = null;
+  renderGameBuffer();
+}
+function killWord(w) {
+  var i = game.words.indexOf(w);
+  if (i !== -1) game.words.splice(i, 1);
+  if (w.el) {
+    (function (el) {
+      el.classList.add('hit');
+      window.setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 300);
+    })(w.el);
+  }
+  game.kills++;
+  game.combo++;
+  if (game.combo > game.bestCombo) game.bestCombo = game.combo;
+  game.score += Math.round(w.word.length * 10 * (1 + Math.min(game.combo, 10) * 0.1));
+  game.buffer = '';
+  game.target = null;
+  blip('hit');
+  updateGameHUD();
+  renderGameBuffer();
+}
+function renderGameBuffer() {
+  var el = $('#gameBuffer');
+  el.innerHTML = esc(game.buffer) + '<span class="caret2"></span>';
+  game.words.forEach(function (w) {
+    if (w === game.target) {
+      w.el.innerHTML = '<span class="typed">' + esc(w.word.slice(0, game.buffer.length)) + '</span>' + esc(w.word.slice(game.buffer.length));
+      w.el.setAttribute('data-hl', '1');
+    } else if (w.el.getAttribute('data-hl') === '1') {
+      w.el.innerHTML = esc(w.word);
+      w.el.removeAttribute('data-hl');
+    }
+  });
+}
+function updateGameHUD() {
+  $('#gScore').textContent = game.score;
+  $('#gCombo').textContent = '×' + game.combo;
+  $('#gKills').textContent = game.kills;
+  var html = '';
+  for (var i = 0; i < 3; i++) html += '<i' + (i < game.lives ? '' : ' class="lost"') + '></i>';
+  $('#gLives').innerHTML = html;
+}
+function pauseGame() {
+  if (!game.running || game.paused) return;
+  game.paused = true;
+  if (game.raf) { window.cancelAnimationFrame(game.raf); game.raf = null; }
+  setGameOverlay('pause');
+}
+function resumeGame() {
+  if (!game.running || !game.paused) return;
+  game.paused = false;
+  game.lastTs = 0;
+  $('#gameOverlay').hidden = true;
+  game.raf = window.requestAnimationFrame(gameStep);
+}
+function togglePauseGame() {
+  if (!game.running) return;
+  if (game.paused) resumeGame(); else pauseGame();
+}
+function gameOver() {
+  game.running = false;
+  game.paused = false;
+  if (game.raf) { window.cancelAnimationFrame(game.raf); game.raf = null; }
+  var sec = Math.max(1, (Date.now() - game.startTs) / 1000);
+  var totalKeys = game.accepted + game.rejected;
+  var entry = {
+    ts: Date.now(),
+    mode: 'game',
+    label: '单词雨 · ' + ({ easy: '悠闲', normal: '标准', hard: '极速' }[game.difficulty] || '标准'),
+    lessonId: null,
+    lang: 'en',
+    wpm: Math.round((game.accepted / 5) / (sec / 60) * 10) / 10,
+    cpm: Math.round(game.accepted / (sec / 60) * 10) / 10,
+    acc: totalKeys ? Math.round(game.accepted / totalKeys * 1000) / 10 : 100,
+    sec: Math.round(sec),
+    chars: game.accepted,
+    typed: game.accepted,
+    keystrokes: totalKeys,
+    errs: game.rejected,
+    errSummary: { adjacent: 0, case: 0, punct: 0, other: 0 }
+  };
+  state.history.unshift(entry);
+  if (state.history.length > 200) state.history.length = 200;
+  state.totals.sec += entry.sec;
+  state.totals.sessions += 1;
+  state.totals.chars += entry.typed;
+  saveState();
+  updateSideTotals();
+  setGameOverlay('over', { score: game.score, kills: game.kills, combo: game.bestCombo });
+}
+function gameEnter() {
+  if (game.running) {
+    if (game.paused) setGameOverlay('pause');
+  } else {
+    setGameOverlay('idle');
+  }
+}
+function gameLeave() {
+  if (game.running && !game.paused) pauseGame();
+}
+
+/* ════════════ 16. 考试模拟 ════════════ */
+var exam = { engine: null, minutes: 5, scope: 'mix', running: false, deadline: 0, timerId: null, lastText: '', lastLang: 'en' };
+var SCOPE_LABELS = { mix: '综合', en: '英文段落', zh: '中文段落', code: '代码片段' };
+function buildExamText(scope, minutes) {
+  var need = minutes * 380;
+  var en = [];
+  var zh = [];
+  var code = [];
+  allLessons().forEach(function (ls) { (ls.lang === 'zh' ? zh : en).push(ls.text); });
+  LIBRARY.forEach(function (it) {
+    if (it.cat === 'code') code.push(it.text);
+    else if (it.lang === 'zh' && it.cat !== 'pro') zh.push(it.text);
+    else if (it.lang === 'en' && it.cat !== 'pro') en.push(it.text);
+  });
+  var pools = scope === 'en' ? [en] : scope === 'zh' ? [zh] : scope === 'code' ? [code] : [en, zh];
+  var out = '';
+  var pi = 0;
+  var guard = 0;
+  while (out.length < need && guard < 300) {
+    guard++;
+    var pool = pools[pi % pools.length];
+    if (!pool.length) { pool = pools[0]; }
+    var text = pool[rand(pool.length)];
+    out += (out ? '\n\n' : '') + text;
+    pi++;
+  }
+  return out.slice(0, need + 120);
+}
+function examStart() {
+  exam.minutes = Number(($('#examLen button.active') || { getAttribute: function () { return '5'; } }).getAttribute('data-min')) || 5;
+  exam.scope = $('#examScope').value || 'mix';
+  exam.lastText = buildExamText(exam.scope, exam.minutes);
+  exam.lastLang = exam.scope === 'zh' ? 'zh' : 'en';
+  $('#examSetup').hidden = true;
+  $('#examReport').hidden = true;
+  $('#examRun').hidden = false;
+  exam.engine.feedbackless = true;
+  exam.engine.liveFeedback = false;
+  exam.engine.timeLimitSec = 0;
+  exam.engine.load(exam.lastText, exam.lastLang);
+  exam.running = true;
+  exam.deadline = Date.now() + exam.minutes * 60000;
+  $('#examTimer').textContent = fmtClock(exam.minutes * 60);
+  $('#examTimer').classList.remove('urgent');
+  $('#examCount').textContent = '已输入 0 字';
+  $('#examRate').textContent = '0 字 / 分';
+  $('#examProgressBar').style.width = '0%';
+  if (exam.timerId) window.clearInterval(exam.timerId);
+  exam.timerId = window.setInterval(examTick, 250);
+  exam.engine.focus();
+}
+function examTick() {
+  if (!exam.running) return;
+  var remain = (exam.deadline - Date.now()) / 1000;
+  if (remain <= 0) { doExamSubmit(); return; }
+  var tEl = $('#examTimer');
+  tEl.textContent = fmtClock(remain);
+  tEl.classList.toggle('urgent', remain <= 30);
+  var eng = exam.engine;
+  if (eng.started && !eng.done) {
+    var st = eng.stats();
+    $('#examCount').textContent = '已输入 ' + st.typedLen + ' 字';
+    $('#examRate').textContent = fmtNum(st.cpm) + ' 字 / 分';
+    var pct = eng.chars.length ? Math.min(100, st.typedLen / eng.chars.length * 100) : 0;
+    $('#examProgressBar').style.width = pct + '%';
+  }
+}
+function doExamSubmit() {
+  if (!exam.running) return;
+  exam.running = false;
+  if (exam.timerId) { window.clearInterval(exam.timerId); exam.timerId = null; }
+  if (!exam.engine.started) {
+    $('#examRun').hidden = true;
+    $('#examSetup').hidden = false;
+    toast('尚未输入内容，本次考试已取消', 'warn');
+    return;
+  }
+  exam.engine.finish();
+}
+function examFinish(st, eng) {
+  var entry = {
+    ts: Date.now(),
+    mode: 'exam',
+    label: '考试模拟 · ' + (SCOPE_LABELS[exam.scope] || '综合') + ' · ' + exam.minutes + ' 分钟',
+    lessonId: null,
+    lang: exam.lastLang,
+    wpm: Math.round(st.wpm * 10) / 10,
+    cpm: Math.round(st.cpm * 10) / 10,
+    acc: Math.round(st.acc * 10) / 10,
+    sec: Math.round(st.sec),
+    chars: eng.chars.length,
+    typed: st.typedLen,
+    keystrokes: st.keystrokes,
+    errs: st.errKeystrokes,
+    errSummary: summarizeErrors(eng.errPairs)
+  };
+  state.history.unshift(entry);
+  if (state.history.length > 200) state.history.length = 200;
+  mergeKeyStats(eng.keyStats);
+  state.totals.sec += entry.sec;
+  state.totals.sessions += 1;
+  state.totals.chars += entry.typed;
+  saveState();
+  updateSideTotals();
+  paintKeyHeat(state.keyStats);
+  var score = st.wpm * st.acc / 100;
+  var grade = score >= 70 ? 'A' : score >= 50 ? 'B' : score >= 30 ? 'C' : 'D';
+  $('#reportGrade').innerHTML = grade + '<small>评级</small>';
+  $('#reportMeta').textContent = (SCOPE_LABELS[exam.scope] || '综合') + ' · ' + exam.minutes + ' 分钟 · 用时 ' + fmtDur(st.sec) + ' · 完成 ' + st.typedLen + ' 字';
+  var speedV = exam.lastLang === 'zh' ? fmtNum(st.cpm) + ' 字/分' : fmtNum(st.wpm) + ' WPM';
+  $('#reportGrid').innerHTML =
+    '<div class="res-cell"><span class="rc-k">净速度</span><span class="rc-v">' + speedV + '</span></div>' +
+    '<div class="res-cell"><span class="rc-k">正确率</span><span class="rc-v">' + fmtNum(st.acc) + '<small> %</small></span></div>' +
+    '<div class="res-cell"><span class="rc-k">完成字数</span><span class="rc-v">' + st.typedLen + '<small> / ' + eng.chars.length + '</small></span></div>' +
+    '<div class="res-cell"><span class="rc-k">击键 / 错误</span><span class="rc-v">' + st.keystrokes + '<small> / ' + st.errKeystrokes + '</small></span></div>';
+  var list = $('#reportErrs');
+  var pairs = eng.errPairs.slice(0, 50);
+  $('#reportErrCount').textContent = eng.errPairs.length + ' 处';
+  if (!pairs.length) {
+    list.innerHTML = '<div class="err-item" style="background: var(--color-accent-soft)"><span class="pos">—</span><span class="want">全程没有出现错误。</span></div>';
+  } else {
+    list.innerHTML = pairs.map(function (p) {
+      var w = p.want === '\n' ? '回车' : p.want;
+      var g = p.got === '\n' ? '回车' : p.got;
+      return '<div class="err-item"><span class="pos">#' + (p.idx + 1) + '</span><span class="want">期望「' + esc(w) + '」</span><span class="got">输入「' + esc(g) + '」</span></div>';
+    }).join('');
+  }
+  $('#examRun').hidden = true;
+  $('#examReport').hidden = false;
+  toast('成绩单已生成');
+}
+
+/* ════════════ 17. 数据统计渲染 ════════════ */
+function avgOf(arr) {
+  if (!arr.length) return null;
+  var s = 0;
+  for (var i = 0; i < arr.length; i++) s += arr[i];
+  return s / arr.length;
+}
+function shortDate(ts) {
+  var d = new Date(ts);
+  return (d.getMonth() + 1) + '/' + d.getDate();
+}
+function renderStats() {
+  var hist = state.history;
+  var recent = hist.slice(0, 30);
+  var speeds = recent.filter(function (h) { return h.wpm > 0 && h.mode !== 'game'; }).map(function (h) { return h.wpm; });
+  var accs = recent.filter(function (h) { return h.acc != null && h.mode !== 'game'; }).map(function (h) { return h.acc; });
+  var avgW = avgOf(speeds);
+  var avgA = avgOf(accs);
+  var allSpeeds = hist.filter(function (h) { return h.wpm > 0; }).map(function (h) { return h.wpm; });
+  $('#kpiWpm').innerHTML = avgW == null ? '—' : fmtNum(avgW, 1) + '<small> WPM</small>';
+  $('#kpiAcc').innerHTML = avgA == null ? '—' : fmtNum(avgA, 1) + '<small> %</small>';
+  $('#kpiTime').innerHTML = fmtNum(state.totals.sec / 60) + '<small> 分钟</small>';
+  $('#kpiSessions').textContent = state.totals.sessions;
+  $('#kpiBest').innerHTML = allSpeeds.length ? fmtNum(Math.max.apply(null, allSpeeds), 1) + '<small> WPM</small>' : '—';
+  renderTrend(hist.slice(0, 14));
+  renderTypeBars(recent);
+  renderHeat();
+  renderWeakTable();
+  renderHistory();
+  $('#historyCount').textContent = hist.length + ' 条';
+}
+function renderTrend(items) {
+  var svg = $('#trendChart');
+  var table = $('#trendTable');
+  var empty = $('#trendEmpty');
+  var pts = items.slice().reverse().filter(function (h) { return h.wpm > 0; });
+  if (pts.length < 2) {
+    svg.innerHTML = '';
+    table.innerHTML = '';
+    empty.hidden = false;
+    return;
+  }
+  empty.hidden = true;
+  var W = 640, H = 240, padL = 46, padR = 22, padT = 18, padB = 30;
+  var maxW = Math.max(60, Math.ceil(Math.max.apply(null, pts.map(function (p) { return p.wpm; })) / 20) * 20);
+  var n = pts.length;
+  function xAt(i) { return padL + i * (W - padL - padR) / (n - 1); }
+  function yW(v) { return padT + (1 - v / maxW) * (H - padT - padB); }
+  function yA(v) { return padT + (1 - v / 100) * (H - padT - padB); }
+  var parts = [];
+  for (var g = 0; g <= 4; g++) {
+    var val = maxW * g / 4;
+    var yy = yW(val);
+    parts.push('<line class="grid-line" x1="' + padL + '" y1="' + yy + '" x2="' + (W - padR) + '" y2="' + yy + '" />');
+    parts.push('<text class="axis" x="' + (padL - 8) + '" y="' + (yy + 3) + '" text-anchor="end" data-value="' + fmtNum(val) + '">' + fmtNum(val) + '</text>');
+  }
+  var dW = '';
+  var dA = '';
+  pts.forEach(function (p, i) {
+    dW += (i ? ' L' : 'M') + xAt(i) + ' ' + yW(p.wpm);
+    dA += (i ? ' L' : 'M') + xAt(i) + ' ' + yA(p.acc);
+  });
+  parts.push('<path class="series s1" d="' + dW + '" />');
+  parts.push('<path class="series s2" d="' + dA + '" />');
+  pts.forEach(function (p, i) {
+    parts.push('<circle class="dot s1" cx="' + xAt(i) + '" cy="' + yW(p.wpm) + '" r="3.4"><title>' + fmtWhen(p.ts) + '：' + fmtNum(p.wpm) + ' WPM</title></circle>');
+    parts.push('<circle class="dot s2" cx="' + xAt(i) + '" cy="' + yA(p.acc) + '" r="3.4"><title>' + fmtWhen(p.ts) + '：正确率 ' + fmtNum(p.acc) + '%</title></circle>');
+  });
+  parts.push('<text class="axis" x="' + padL + '" y="' + (H - 8) + '">起点 ' + shortDate(pts[0].ts) + '</text>');
+  parts.push('<text class="axis" x="' + (W - padR) + '" y="' + (H - 8) + '" text-anchor="end">' + shortDate(pts[n - 1].ts) + '</text>');
+  svg.innerHTML = parts.join('');
+  var rows = '<thead><tr><th>序号</th><th>时间</th><th>速度</th><th>正确率</th></tr></thead><tbody>';
+  pts.forEach(function (p, i) {
+    rows += '<tr><td>' + (i + 1) + '</td><td>' + fmtWhen(p.ts) + '</td><td>' + fmtNum(p.wpm) + ' WPM</td><td>' + fmtNum(p.acc) + '%</td></tr>';
+  });
+  rows += '</tbody>';
+  table.innerHTML = rows;
+}
+function renderTypeBars(recent) {
+  var sum = { adjacent: 0, case: 0, punct: 0, other: 0 };
+  recent.forEach(function (h) {
+    if (!h.errSummary) return;
+    Object.keys(sum).forEach(function (k) { sum[k] += h.errSummary[k] || 0; });
+  });
+  var total = sum.adjacent + sum.case + sum.punct + sum.other;
+  var wrap = $('#typeBars');
+  if (!total) {
+    wrap.innerHTML = '<div class="empty-state"><svg aria-hidden="true"><use href="#i-info"/></svg><p class="small">完成含错误的练习后，这里会显示错误原因的构成。</p></div>';
+    return;
+  }
+  var defs = [
+    ['adjacent', '相邻键误触', 'tb-adjacent'],
+    ['case', '大小写与 Shift', ''],
+    ['punct', '近形符号混淆', ''],
+    ['other', '其他误击', '']
+  ];
+  wrap.innerHTML = defs.map(function (d) {
+    var v = sum[d[0]];
+    var share = Math.round(v / total * 100);
+    return '<div class="typebar ' + d[2] + '"><div class="tb-head"><span>' + d[1] + '</span><span class="num">' + v + ' 次 · ' + share + '%</span></div>' +
+      '<div class="tb-track"><div class="tb-fill" style="width: ' + share + '%"></div></div></div>';
+  }).join('');
+}
+function renderHeat() {
+  var wrap = $('#heatKbd');
+  var html = '';
+  KBD_ROWS.forEach(function (row) {
+    html += '<div class="kbd-row">';
+    row.forEach(function (k) {
+      var base = k[0].length === 1 ? k[0] : null;
+      var display = k[1] || k[0];
+      var rec = base ? state.keyStats[base] : null;
+      var heat = rec && rec.total >= 4 && rec.err > 0 ? clamp((rec.err / rec.total) * 2.4, 0.06, 1) : 0;
+      var title = rec ? (display + '：' + rec.total + ' 次击键 · ' + rec.err + ' 次错误') : display;
+      html += '<div class="heat-cell" title="' + esc(title) + '" style="--heat: ' + (heat ? fmtNum(heat, 2) : '0') + (base ? '' : '; opacity: 0.55') + '">' + esc(display) + '</div>';
+    });
+    html += '</div>';
+  });
+  wrap.innerHTML = html;
+}
+function renderWeakTable() {
+  var top = topWeakKeys(10);
+  var body = $('#weakTableBody');
+  if (!top.length) {
+    body.innerHTML = '<tr><td colspan="5" class="muted">暂无足够数据。完成几组练习后，弱键排行会在这里生成。</td></tr>';
+    return;
+  }
+  body.innerHTML = top.map(function (w) {
+    return '<tr><td><span class="weak-key">' + esc(w.key) + '</span></td>' +
+      '<td class="num-col">' + w.total + '</td><td class="num-col">' + w.err + '</td>' +
+      '<td class="num-col">' + fmtNum(w.rate * 100, 1) + '%</td>' +
+      '<td><div class="bar-mini"><i style="width: ' + Math.round(w.rate * 100) + '%"></i></div></td></tr>';
+  }).join('');
+}
+function renderHistory() {
+  var rows = state.history.slice(0, 12);
+  var body = $('#historyBody');
+  if (!rows.length) {
+    body.innerHTML = '<tr><td colspan="6" class="muted">还没有练习记录，从练习模式开始第一段吧。</td></tr>';
+    return;
+  }
+  var modeNames = { lesson: '课程', library: '素材', custom: '自定义', speed: '冲刺', weak: '弱键', blind: '盲打', game: '游戏', exam: '考试', practice: '练习' };
+  body.innerHTML = rows.map(function (h) {
+    var speed = h.lang === 'zh' ? fmtNum(h.cpm) + ' 字/分' : fmtNum(h.wpm) + ' WPM';
+    return '<tr><td>' + fmtWhen(h.ts) + '</td><td>' + esc(modeNames[h.mode] || '练习') + '</td><td>' + esc(h.label) + '</td>' +
+      '<td class="num-col">' + speed + '</td><td class="num-col">' + fmtNum(h.acc) + '%</td><td class="num-col">' + fmtDur(h.sec) + '</td></tr>';
+  }).join('');
+}
+function exportData() {
+  try {
+    var payload = { app: '键程打字练习', exportedAt: new Date().toISOString(), data: state };
+    var url = 'data:application/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(payload, null, 2));
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'jiancheng-typing-export.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    toast('记录已导出为 JSON 文件');
+  } catch (err) { toast('导出失败：当前浏览器不支持', 'warn'); }
+}
+
+/* ════════════ 18. 交互绑定与初始化 ════════════ */
+function pressed(sel) {
+  var el = $(sel);
+  return !!el && el.getAttribute('aria-pressed') === 'true';
+}
+function syncSelect(val) {
+  var sel = $('#lessonSelect');
+  if (val && sel.querySelector('option[value="' + val + '"]')) sel.value = val;
+}
+function bindUI() {
+  $$('.nav-item').forEach(function (b) {
+    on(b, 'click', function () { switchView(b.getAttribute('data-view')); });
+  });
+  on($('#themeToggle'), 'click', function () {
+    state.settings.theme = effectiveTheme() === 'dark' ? 'light' : 'dark';
+    saveState();
+    applyPrefs();
+  });
+  on($('#soundBtnSide'), 'click', function () { setPref('sound', !state.settings.sound); });
+  on($('#settingsOpen'), 'click', function () { openModal('#settingsModal'); });
+  on($('#shortcutOpen'), 'click', function () { openModal('#shortcutModal'); });
+
+  on($('#setTheme'), 'click', function (e) {
+    var b = e.target.closest ? e.target.closest('button') : null;
+    if (!b) return;
+    state.settings.theme = b.getAttribute('data-theme-val');
+    saveState();
+    applyPrefs();
+  });
+  [['#setSize', 'size'], ['#setDensity', 'density'], ['#setRadius', 'radius']].forEach(function (p) {
+    on($(p[0]), 'click', function (e) {
+      var b = e.target.closest ? e.target.closest('button') : null;
+      if (!b) return;
+      setPref(p[1], Number(b.getAttribute('data-val')), true);
+    });
+  });
+  [['#optStrict', 'strict'], ['#optKbd', 'showKbd'], ['#optSound', 'sound'],
+   ['#optStrict2', 'strict'], ['#optKbd2', 'showKbd'], ['#optSound2', 'sound']].forEach(function (p) {
+    on($(p[0]), 'click', function () { setPref(p[1], !state.settings[p[1]]); });
+  });
+  on($('#resetPrefs'), 'click', function () {
+    state.settings = defaultState().settings;
+    saveState();
+    applyPrefs();
+    toast('已恢复默认偏好');
+  });
+
+  on($('#lessonSelect'), 'change', function () {
+    var src = srcForValue(this.value);
+    if (src) loadPractice(src);
+  });
+  on($('#startBtn'), 'click', function () {
+    if (practice.engine.done) restartPractice();
+    else practice.engine.focus();
+  });
+  on($('#restartBtn'), 'click', restartPractice);
+  on($('#resultRetry'), 'click', restartPractice);
+  on($('#stageOverlay'), 'click', function (e) {
+    var b = e.target.closest ? e.target.closest('[data-act]') : null;
+    if (!b) return;
+    var act = b.getAttribute('data-act');
+    if (act === 'start') { overlayHide(); practice.engine.focus(); }
+    else if (act === 'again') restartPractice();
+    else if (act === 'hide') overlayHide();
+  });
+
+  on($('#levelBlocks'), 'click', function (e) {
+    var b = e.target.closest ? e.target.closest('[data-lesson]') : null;
+    if (!b) return;
+    var id = b.getAttribute('data-lesson');
+    var src = srcForValue('lesson:' + id);
+    if (!src) return;
+    syncSelect(src.selectValue);
+    loadPractice(src);
+    switchView('practice');
+  });
+  on($('#continueBtn'), 'click', function () {
+    var last = null;
+    state.history.some(function (h) { if (h.lessonId) { last = h; return true; } return false; });
+    var src = last ? srcForValue('lesson:' + last.lessonId) : null;
+    if (!src) src = srcForValue('lesson:' + COURSES[0].lessons[0].id);
+    if (src) { syncSelect(src.selectValue); loadPractice(src); }
+    switchView('practice');
+  });
+
+  on($('#speedDurations'), 'click', function (e) {
+    var b = e.target.closest ? e.target.closest('button') : null;
+    if (!b) return;
+    $$('#speedDurations button').forEach(function (x) { x.classList.toggle('active', x === b); });
+  });
+  on($('#speedStart'), 'click', function () {
+    var b = $('#speedDurations button.active');
+    var sec = Number(b ? b.getAttribute('data-sec') : 120) || 120;
+    loadPractice({ mode: 'speed', label: '提速冲刺 · ' + sec + ' 秒', text: buildSpeedText(sec), lang: 'en', durationSec: sec });
+    switchView('practice');
+    toast('冲刺开始，专注节奏');
+  });
+  [['#blindKbd', 'blindKbd'], ['#blindText', 'blindText']].forEach(function (p) {
+    on($(p[0]), 'click', function () {
+      var el = $(p[0]);
+      el.setAttribute('aria-pressed', pressed(p[0]) ? 'false' : 'true');
+    });
+  });
+  on($('#weakStart'), 'click', function () {
+    var drill = buildWeakDrill();
+    if (!drill) { toast('数据还不够，先完成几组练习或一次考试', 'warn'); return; }
+    loadPractice({ mode: 'weak', label: '易错键强化 · 自动生成', text: drill, lang: 'en' });
+    switchView('practice');
+  });
+  on($('#blindStart'), 'click', function () {
+    var base = selectedLessonSrc();
+    if (!base) return;
+    loadPractice({
+      text: base.text,
+      lang: base.lang,
+      mode: 'blind',
+      label: '盲打 · ' + (base.label || '自定义文本'),
+      blindText: pressed('#blindText'),
+      hideKbd: pressed('#blindKbd')
+    });
+    switchView('practice');
+  });
+
+  on($('#libTabs'), 'click', function (e) {
+    var b = e.target.closest ? e.target.closest('button[data-cat]') : null;
+    if (!b) return;
+    libCat = b.getAttribute('data-cat');
+    $$('#libTabs .tab').forEach(function (t) {
+      var onTab = t === b;
+      t.classList.toggle('active', onTab);
+      t.setAttribute('aria-selected', onTab ? 'true' : 'false');
+    });
+    renderLibGrid();
+  });
+  on($('#libGrid'), 'click', function (e) {
+    var t = e.target;
+    if (!t.closest) return;
+    var b = t.closest('[data-lib]');
+    if (b) { loadLibItem(b.getAttribute('data-lib')); return; }
+    var r = t.closest('[data-lib-rand]');
+    if (r) {
+      var cat = r.getAttribute('data-lib-rand');
+      var items = LIBRARY.filter(function (it) { return it.cat === cat; });
+      if (items.length) loadLibItem(pick(items).id);
+    }
+  });
+  function loadLibItem(id) {
+    var src = srcForValue('lib:' + id);
+    if (!src) return;
+    syncSelect(src.selectValue);
+    loadPractice(src);
+    switchView('practice');
+  }
+  on($('#importSave'), 'click', saveCustomText);
+  on($('#importClear'), 'click', function () {
+    $('#importText').value = '';
+    $('#importTitle').value = '';
+  });
+  on($('#customList'), 'click', function (e) {
+    var t = e.target;
+    if (!t.closest) return;
+    var p = t.closest('[data-custom-play]');
+    if (p) {
+      var src = srcForValue('custom:' + p.getAttribute('data-custom-play'));
+      if (src) { syncSelect(src.selectValue); loadPractice(src); switchView('practice'); }
+      return;
+    }
+    var d = t.closest('[data-custom-del]');
+    if (d) {
+      var id = d.getAttribute('data-custom-del');
+      var item = null;
+      state.customTexts.forEach(function (it) { if (it.id === id) item = it; });
+      if (!item) return;
+      askConfirm('删除自定义素材', '将删除「' + item.title + '」，删除后无法恢复。', function () {
+        state.customTexts = state.customTexts.filter(function (it) { return it.id !== id; });
+        saveState();
+        buildLessonSelect();
+        renderCustomList();
+        toast('素材已删除');
+      });
+    }
+  });
+
+  on($('#gameOverlay'), 'click', function (e) {
+    var b = e.target.closest ? e.target.closest('[data-act]') : null;
+    if (!b) return;
+    var act = b.getAttribute('data-act');
+    if (act === 'start') startGame();
+    else if (act === 'resume') resumeGame();
+    else if (act === 'stop') gameOver();
+  });
+  on($('#gameDifficulty'), 'click', function (e) {
+    var b = e.target.closest ? e.target.closest('button') : null;
+    if (!b) return;
+    $$('#gameDifficulty button').forEach(function (x) { x.classList.toggle('active', x === b); });
+    game.difficulty = b.getAttribute('data-lv') || 'normal';
+  });
+
+  on($('#examLen'), 'click', function (e) {
+    var b = e.target.closest ? e.target.closest('button') : null;
+    if (!b) return;
+    $$('#examLen button').forEach(function (x) { x.classList.toggle('active', x === b); });
+  });
+  on($('#examStartBtn'), 'click', examStart);
+  on($('#examSubmitBtn'), 'click', function () {
+    askConfirm('确认交卷', '提前交卷将立即结束计时并生成成绩单。', doExamSubmit);
+  });
+  on($('#reportRetry'), 'click', examStart);
+  on($('#reportPractice'), 'click', function () {
+    loadPractice({ mode: 'custom', label: '试卷练习 · 全卷', text: exam.lastText, lang: exam.lastLang });
+    switchView('practice');
+  });
+
+  on($('#exportBtn'), 'click', exportData);
+  on($('#wipeBtn'), 'click', function () {
+    askConfirm('清空全部数据', '将删除全部练习记录、弱键统计与自定义素材，操作无法撤销。', function () {
+      state = defaultState();
+      saveState();
+      applyPrefs();
+      buildLessonSelect();
+      renderCustomList();
+      renderStats();
+      renderTraining();
+      renderLessons();
+      paintKeyHeat(state.keyStats);
+      updateSideTotals();
+      toast('已清空全部数据');
+    });
+  });
+
+  on($('#confirmYes'), 'click', function () {
+    closeModals();
+    var cb = confirmCb;
+    confirmCb = null;
+    if (cb) cb();
+  });
+  on($('#confirmNo'), 'click', function () { closeModals(); confirmCb = null; });
+
+  on(document, 'keydown', function (e) {
+    var tag = (e.target && e.target.tagName) || '';
+    var inField = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+    if (e.key === 'Escape') {
+      closeModals();
+      if (currentView === 'game' && game.running) togglePauseGame();
+      return;
+    }
+    if (e.altKey && !e.ctrlKey && !e.metaKey && e.key >= '1' && e.key <= '7') {
+      e.preventDefault();
+      switchView(VIEWS[Number(e.key) - 1]);
+      return;
+    }
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault();
+      if (currentView === 'practice') restartPractice();
+      return;
+    }
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'm' || e.key === 'M') && !e.shiftKey) {
+      e.preventDefault();
+      setPref('sound', !state.settings.sound);
+      return;
+    }
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
+      e.preventDefault();
+      setPref('showKbd', !state.settings.showKbd);
+      return;
+    }
+    if (currentView === 'game' && game.running && !game.paused && !inField) {
+      if (e.key === 'Backspace') { e.preventDefault(); gameBackspace(); return; }
+      if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey && /[a-zA-Z]/.test(e.key)) {
+        e.preventDefault();
+        gameType(e.key);
+      }
+    }
+  });
+}
+
+function buildSpeedText(sec) {
+  var need = Math.ceil(sec / 60 * 130) + 24;
+  var out = [];
+  var pool = shuffle(GAME_WORDS);
+  while (out.length < need) out = out.concat(pool);
+  return out.slice(0, need).join(' ');
+}
+
+function init() {
+  loadState();
+  applyPrefs();
+  buildKeyMaps();
+  buildKeyboard();
+  buildLessonSelect();
+  practice.engine = new TypingEngine({
+    textEl: $('#practiceText'),
+    stageEl: $('#practiceStage'),
+    inputEl: $('#typeInput'),
+    liveEl: $('#metaLive'),
+    progressEl: $('#metaProgress'),
+    onStart: function () { overlayHide(); },
+    onFinish: onPracticeFinish
+  });
+  currentEngine = practice.engine;
+  exam.engine = new TypingEngine({
+    textEl: $('#examText'),
+    stageEl: $('#examStage'),
+    inputEl: $('#examInput'),
+    liveEl: null,
+    progressEl: null,
+    liveFeedback: false,
+    onFinish: examFinish
+  });
+  exam.engine.feedbackless = true;
+  bindUI();
+  renderLessons();
+  renderTraining();
+  renderLibrary();
+  renderStats();
+  updateSideTotals();
+  paintKeyHeat(state.keyStats);
+  var first = 'lesson:' + COURSES[0].lessons[0].id;
+  var last = null;
+  state.history.some(function (h) { if (h.lessonId) { last = h; return true; } return false; });
+  if (last && findLesson(last.lessonId)) first = 'lesson:' + last.lessonId;
+  syncSelect(first);
+  loadPractice(srcForValue(first));
+}
+init();
+})();
+</script>
+</body>
+</html>

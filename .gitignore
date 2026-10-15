@@ -1,0 +1,12 @@
+# ═══ 构建与调试临时目录 ═══
+# 构建过程中的中间产物、Edge 调试配置（_edgeprofile）、日志与草稿脚本
+temporary/
+
+# ═══ 系统与编辑器杂项 ═══
+Thumbs.db
+desktop.ini
+.DS_Store
+*.tmp
+*.log
+*.swp
+*~

@@ -1,0 +1,274 @@
+{
+  "status": "ready_to_present",
+  "planApproved": true,
+  "designPlan": {
+    "status": "approved",
+    "approvedAt": "2026-10-14T01:24:04Z",
+    "approvedPlanHash": "728bff23503ef7cadf0bdd8bee2143c5a8fe76295ba3616f92470a646426ea08",
+    "directExecution": null
+  },
+  "lastLintSummary": {
+    "p0": 0,
+    "p1": 0,
+    "p2": 0,
+    "fileCount": 1,
+    "checkedAt": "2026-10-14T01:49:17.361296+00:00"
+  },
+  "p1Waivers": [],
+  "buildStatus": "not_applicable",
+  "buildCommand": "",
+  "noBuildReason": "单文件自包含 HTML 产物（file:// 双击运行），无构建步骤。",
+  "nudgesStatus": "provided",
+  "noNudgesReason": "",
+  "tweaksStatus": "provided",
+  "tweaksCount": 16,
+  "nudges": [
+    {
+      "id": "color-bg",
+      "label": "背景底色 / Light",
+      "group": "Colors",
+      "control": "color",
+      "variable": "--seed-bg",
+      "selector": ":root",
+      "value": "#F1EEE8"
+    },
+    {
+      "id": "color-surface",
+      "label": "表面色 / Light",
+      "group": "Colors",
+      "control": "color",
+      "variable": "--seed-surface",
+      "selector": ":root",
+      "value": "#FAF8F3"
+    },
+    {
+      "id": "color-fg",
+      "label": "文字前景 / Light",
+      "group": "Colors",
+      "control": "color",
+      "variable": "--seed-fg",
+      "selector": ":root",
+      "value": "#3A3833"
+    },
+    {
+      "id": "color-primary",
+      "label": "主色 · 黛蓝 / Light",
+      "group": "Colors",
+      "control": "color",
+      "variable": "--seed-primary",
+      "selector": ":root",
+      "value": "#5B7080"
+    },
+    {
+      "id": "color-accent",
+      "label": "强调色 · 鼠尾草绿 / Light",
+      "group": "Colors",
+      "control": "color",
+      "variable": "--seed-accent",
+      "selector": ":root",
+      "value": "#93A489"
+    },
+    {
+      "id": "color-error",
+      "label": "错误色 · 陶土红 / Light",
+      "group": "Colors",
+      "control": "color",
+      "variable": "--seed-error",
+      "selector": ":root",
+      "value": "#B0736A"
+    },
+    {
+      "id": "scale-radius",
+      "label": "圆角级别",
+      "group": "Layout",
+      "control": "slider",
+      "variable": "--seed-radius",
+      "selector": ":root",
+      "value": "12px",
+      "min": 0,
+      "max": 24,
+      "step": 2
+    },
+    {
+      "id": "scale-density",
+      "label": "界面密度",
+      "group": "Layout",
+      "control": "slider",
+      "variable": "--seed-density",
+      "selector": ":root",
+      "value": "1",
+      "min": 0.85,
+      "max": 1.3,
+      "step": 0.05
+    },
+    {
+      "id": "scale-text",
+      "label": "练习字号",
+      "group": "Layout",
+      "control": "slider",
+      "variable": "--seed-text-scale",
+      "selector": ":root",
+      "value": "1",
+      "min": 0.85,
+      "max": 1.5,
+      "step": 0.05
+    },
+    {
+      "id": "appearance",
+      "label": "Appearance",
+      "group": "Appearance",
+      "control": "preset",
+      "value": "light",
+      "presetOptions": [
+        {
+          "id": "light",
+          "label": "Light · 暖灰浅色",
+          "patches": [
+            {
+              "variable": "--seed-bg",
+              "value": "#F1EEE8"
+            },
+            {
+              "variable": "--seed-surface",
+              "value": "#FAF8F3"
+            },
+            {
+              "variable": "--seed-fg",
+              "value": "#3A3833"
+            },
+            {
+              "variable": "--seed-primary",
+              "value": "#5B7080"
+            },
+            {
+              "variable": "--seed-accent",
+              "value": "#93A489"
+            },
+            {
+              "variable": "--seed-error",
+              "value": "#B0736A"
+            }
+          ]
+        },
+        {
+          "id": "dark",
+          "label": "Dark · 深色夜间",
+          "patches": [
+            {
+              "variable": "--seed-bg",
+              "value": "#2A2723"
+            },
+            {
+              "variable": "--seed-surface",
+              "value": "#35312B"
+            },
+            {
+              "variable": "--seed-fg",
+              "value": "#E9E4DA"
+            },
+            {
+              "variable": "--seed-primary",
+              "value": "#93A5B5"
+            },
+            {
+              "variable": "--seed-accent",
+              "value": "#A3B499"
+            },
+            {
+              "variable": "--seed-error",
+              "value": "#C98A7F"
+            }
+          ]
+        },
+        {
+          "id": "high-contrast",
+          "label": "High Contrast · 高对比",
+          "patches": [
+            {
+              "variable": "--seed-bg",
+              "value": "#F5F1E8"
+            },
+            {
+              "variable": "--seed-surface",
+              "value": "#FCFAF4"
+            },
+            {
+              "variable": "--seed-fg",
+              "value": "#211F1B"
+            },
+            {
+              "variable": "--seed-primary",
+              "value": "#3E5566"
+            },
+            {
+              "variable": "--seed-accent",
+              "value": "#6E8468"
+            },
+            {
+              "variable": "--seed-error",
+              "value": "#9C564B"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "color-bg-dark",
+      "label": "背景底色 / Dark",
+      "group": "Dark Theme",
+      "control": "color",
+      "variable": "--seed-bg",
+      "selector": "[data-theme=\"dark\"]",
+      "value": "#2A2723"
+    },
+    {
+      "id": "color-surface-dark",
+      "label": "表面色 / Dark",
+      "group": "Dark Theme",
+      "control": "color",
+      "variable": "--seed-surface",
+      "selector": "[data-theme=\"dark\"]",
+      "value": "#35312B"
+    },
+    {
+      "id": "color-fg-dark",
+      "label": "文字前景 / Dark",
+      "group": "Dark Theme",
+      "control": "color",
+      "variable": "--seed-fg",
+      "selector": "[data-theme=\"dark\"]",
+      "value": "#E9E4DA"
+    },
+    {
+      "id": "color-primary-dark",
+      "label": "主色 · 黛蓝 / Dark",
+      "group": "Dark Theme",
+      "control": "color",
+      "variable": "--seed-primary",
+      "selector": "[data-theme=\"dark\"]",
+      "value": "#93A5B5"
+    },
+    {
+      "id": "color-accent-dark",
+      "label": "强调色 · 鼠尾草绿 / Dark",
+      "group": "Dark Theme",
+      "control": "color",
+      "variable": "--seed-accent",
+      "selector": "[data-theme=\"dark\"]",
+      "value": "#A3B499"
+    },
+    {
+      "id": "color-error-dark",
+      "label": "错误色 · 陶土红 / Dark",
+      "group": "Dark Theme",
+      "control": "color",
+      "variable": "--seed-error",
+      "selector": "[data-theme=\"dark\"]",
+      "value": "#C98A7F"
+    }
+  ],
+  "noThemeNudgesReason": "",
+  "noNonColorNudgesReason": "",
+  "fixSummary": "完成单文件打字练习网站 index.html（内联 CSS/JS，零外部依赖，双击离线可用）：七大视图（练习工作台/分级课程/专项训练/素材库/单词雨游戏/考试模拟/数据统计）、逐字符实时高亮打字引擎（含 IME 中文支持、严格模式、限时冲刺）、考试评分报告、localStorage 持久化与趋势图/热力图统计。构建期修复：补全 IIFE 闭合、feedbackless 模式不显示对错反馈、限时训练自动结算与剩余时间显示、[hidden] 属性被 CSS display 覆盖导致结果面板默认可见（新增 [hidden]{display:none!important}）、导出改用 data: URI 避免 Blob API、删除冗余变量。验证：node 语法检查通过、模拟 DOM 冒烟测试 35/35 通过、headless Edge 双主题渲染截图正常、lint P0/P1/P2=0。",
+  "completedAt": "2026-10-14T01:53:30+08:00"
+}
