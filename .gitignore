@@ -10,3 +10,5 @@ desktop.ini
 *.log
 *.swp
 *~
+# DSH 写入流程的工作目录（内容为 outputs 的副本，无需入库）
+.writing/
